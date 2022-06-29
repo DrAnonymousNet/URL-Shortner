@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #intalled APP
     'api',
+    'rest_framework.authtoken',
 
     # install package
-    'rest_framework'
+    'rest_framework',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -51,9 +53,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'api.middleware.RequestExposerMiddleware'
 ]
 
-ROOT_URLCONF = 'url_Shortner.urls'
+ROOT_URLCONF = 'url_shortner.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'url_Shortner.wsgi.application'
+WSGI_APPLICATION = 'url_shortner.wsgi.application'
 
 
 # Database
@@ -120,3 +123,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS':"rest_framework.pagination.LimitOffsetPagination"
+    ,
+    "PAGE_SIZE":100,
+    
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    },
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication']
+
+}
