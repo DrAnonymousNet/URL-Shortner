@@ -33,8 +33,10 @@ class UserRegisterView(APIView):
 
 
 class LinkViewSet(viewsets.ModelViewSet):
+    
     serializer_class = LinkSerializer
     queryset = Link.objects.all()
+    http_method_names = ["get", "post", "delete", "patch"]
 
     def create(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -49,19 +51,22 @@ class LinkViewSet(viewsets.ModelViewSet):
         response.headers["Location"] = url
         return response
 
-    
 
     def get_queryset(self):
+        if self.request.user.is_staff:
+            return  Link.objects.all() 
         if self.request.user.is_authenticated:
             user = self.request.user
             qs = user.link_set.all()
+           
             return qs
         return super().get_queryset()
     
     def get_permissions(self):
         permission_class = []
-        if self.action in ["list","partial_update","delete","retrieve"] :
+        if self.action in ["list","partial_update","delete","retrieve","destroy"] :
             permission_class = [permissions.IsAuthenticated()]
+            print("LOVEZ")
         return permission_class
 
     def get_serializer_context(self):
@@ -78,13 +83,15 @@ class RedirectView(APIView):
     def get(self, request:HttpRequest, **kwargs):
         short_link = kwargs.get("str")
         try:
-            
+            user = request.user if request.user.is_authenticated else None
             link = Link.objects.get(short_link__contains=short_link)
         except Http404:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
         link.visit_count = F("visit_count") + 1
         link.save()
         long_link = link.long_link
-        redirect(long_link)
-        return Response({"status":"Redirect successful"}, status=status.HTTP_308_PERMANENT_REDIRECT)
+        
+        return redirect(long_link)
+
+    
 

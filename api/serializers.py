@@ -1,19 +1,16 @@
-from asyncore import write
-from pyexpat import model
-from re import A
+
 from rest_framework.routers import reverse
-from urllib import request
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Link
 from .hash_generator import random_md5
-from django.contrib.auth import get_user_model, authenticate
 from django.db import transaction
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import APIException
 from rest_framework import status
 
 class AvailableAlready(APIException):
-    status_code = status
+    status_code = status.HTTP_208_ALREADY_REPORTED
 
 
 User = get_user_model()
@@ -50,7 +47,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             user = User.objects.create(username=username, password=password)
             token = Token.objects.create(user=user)
-           
             
         return user
 
@@ -64,22 +60,27 @@ class LinkSerializer(serializers.ModelSerializer):
         fields = [
                   "url",
                   "id",
+                  "owner",
                   "short_link",
                   "long_link",
                   "last_visited_date",
                   "visit_count",
                   ]
+        extra_kwargs = {"owner":{
+            "read_only":True
+        }}
 
     def create(self, validated_data):
         request = self.context.get("request")
 
         long_link = validated_data["long_link"]
-        link = Link.objects.filter(owner=request.user, long_link=long_link)
-        if link.exist():
-            return serializers.
+        user = request.user if request.user.is_authenticated else None
+        link = Link.objects.filter(owner=user, long_link=long_link)
+        if link.exists():
+            raise AvailableAlready({"message":"link already exist", "link":link.first().short_link})
 
         scheme = request.is_secure() and "https" or "http"
-        validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link)[0]}'
+        validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link, user)[0]}'
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -97,4 +98,7 @@ class LinkSerializer(serializers.ModelSerializer):
 
         full_url = f'{scheme}://{base_url}{url}'
         return full_url
+
+    def get_owner(self, obj):
+        return obj.owner.username
 

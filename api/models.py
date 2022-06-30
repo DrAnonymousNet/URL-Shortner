@@ -1,13 +1,10 @@
-from statistics import mode
-from urllib import request
 from django.db import models
 from django.utils .translation import gettext as _
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import UserManager
-from django.db.models import F, Q
-from rest_framework.authtoken.models import Token
+from django.db.models import F
 from datetime import datetime, timedelta
 from .hash_generator import random_md5
+import dateutil.tz
 
 # Create your models here.
 
@@ -17,16 +14,20 @@ User = get_user_model()
 class LinkManager(models.Manager):
 
     def find_stale(self):
-        return self.annotate(days_of_inactive = F("last_visited_date") - datetime.now().date()).filter(days_of_inactive__gte = timedelta(days = 30))
+        tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
+        return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 1))
 
 
 class Link(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    short_link = models.URLField(_("Short link"), unique=True, editable=False)
+    short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.URLField(_("Long link"), blank=False, null=False)
     last_visited_date = models.DateField(_("last visited"), auto_now=True, editable=False)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
     objects = LinkManager()
+
+    class Meta:
+        unique_together = ["owner", "long_link", "short_link"]
 
 
     def save(self, **kwargs) -> None:
