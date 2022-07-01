@@ -1,7 +1,7 @@
 from urllib import request, response
 from django.http import Http404, HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from rest_framework.routers import reverse
 from rest_framework import viewsets, permissions
 from .models import Link
 from .serializers import *
@@ -22,7 +22,7 @@ class UserRegisterView(APIView):
 
         user = serializer.save()
 
-        response = Response(serializer.data, status=status.HTTP_201_CREATED)
+        response = Response(serializer.data, status=status.HTTP_201_CREATED, content_type='application/json')
         response.headers["Location"] = ""
         response.data["Token"] = user.auth_token.key
         return response
@@ -33,7 +33,8 @@ class UserRegisterView(APIView):
 
 
 class LinkViewSet(viewsets.ModelViewSet):
-    
+    authentication_classes = []
+    filterset_fields = ['owner', 'visit_count']
     serializer_class = LinkSerializer
     queryset = Link.objects.all()
     http_method_names = ["get", "post", "delete", "patch"]
@@ -47,33 +48,18 @@ class LinkViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(owner = owner)
         response = Response(serializer.data, status=status.HTTP_201_CREATED)
-        url = request.build_absolute_uri(reverse("link-detail", kwargs = {"pk":response.data.get("id")}))
+        url = request.build_absolute_uri(reverse("link-detail",request=request, kwargs = {"pk":response.data.get("id")}))
         response.headers["Location"] = url
         return response
 
 
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return  Link.objects.all() 
-        if self.request.user.is_authenticated:
-            user = self.request.user
-            qs = user.link_set.all()
-           
-            return qs
-        return super().get_queryset()
-    
+    '''
     def get_permissions(self):
         permission_class = []
         if self.action in ["list","partial_update","delete","retrieve","destroy"] :
             permission_class = [permissions.IsAuthenticated()]
-            print("LOVEZ")
         return permission_class
-
-    def get_serializer_context(self):
-        context =  super().get_serializer_context()
-
-        context["request"] = self.request
-        return context
+    '''
 
 
 class RedirectView(APIView):

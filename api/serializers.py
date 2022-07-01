@@ -54,7 +54,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 class LinkSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
-
+    owner = serializers.SerializerMethodField()
     class Meta:
         model = Link
         fields = [
@@ -67,8 +67,10 @@ class LinkSerializer(serializers.ModelSerializer):
                   "visit_count",
                   ]
         extra_kwargs = {"owner":{
-            "read_only":True
-        }}
+            "read_only":True,
+        }
+        
+        }
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -77,28 +79,27 @@ class LinkSerializer(serializers.ModelSerializer):
         user = request.user if request.user.is_authenticated else None
         link = Link.objects.filter(owner=user, long_link=long_link)
         if link.exists():
-            raise AvailableAlready({"message":"link already exist", "link":link.first().short_link})
+            raise AvailableAlready({"message":"link already exist", "short_link":link.first().short_link})
 
         scheme = request.is_secure() and "https" or "http"
         validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link, user)[0]}'
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+    
         request = self.context.get("request")
         long_link = validated_data["long_link"]
-        validated_data["short_link"] = f"{request.get_host()}/{random_md5(long_link)[0]}"
+        validated_data["short_link"] = f"{request.get_host()}/{random_md5(long_link, instance.owner)[0]}"
         return super().update(instance, validated_data)
 
     def get_url(self, obj):
 
         request = self.context.get("request")
-        base_url = request.get_host()
-        url = reverse("link-detail", kwargs={"pk":obj.id})
-        scheme = request.is_secure() and "https" or "http"
-
-        full_url = f'{scheme}://{base_url}{url}'
-        return full_url
+        url = reverse("link-detail", request=request, kwargs={"pk":obj.id})
+        return url
 
     def get_owner(self, obj):
+        if obj.owner is None:
+            return None
         return obj.owner.username
 
