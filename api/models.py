@@ -70,7 +70,6 @@ class Analytic(models.Model):
     # Localization
     country = models.JSONField(default=dict)
     city = models.JSONField(default=dict)
-    # Datetime
     
     objects = AnalyticManager()
 
