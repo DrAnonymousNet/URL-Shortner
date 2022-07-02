@@ -9,8 +9,18 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import F
+from rest_framework.decorators import api_view
 
+from django.contrib.gis.geoip2 import GeoIP2
+from django_user_agents.utils import get_user_agent
 
+@api_view(http_method_names=["get"])
+def my_view(request):
+  
+    user_agent = get_user_agent(request)
+    print(request.META.get("HTTP_REFERER"))
+    return Response({"browser":user_agent.browser, "device":user_agent.device, 
+    "os":user_agent.os})
 
 class UserRegisterView(APIView):
     serializer_class = UserRegisterSerializer
@@ -67,6 +77,7 @@ class RedirectView(APIView):
     authentication_classes = []
 
     def get(self, request:HttpRequest, **kwargs):
+        print(request.META.get("HTTP_REFERER"))
         short_link = kwargs.get("str")
         try:
             user = request.user if request.user.is_authenticated else None

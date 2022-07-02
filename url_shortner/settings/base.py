@@ -42,7 +42,8 @@ INSTALLED_APPS = [
 
     # install package
     'rest_framework',
-    'django_filters'
+    'django_filters',
+     'django_user_agents',
 ]
 
 MIDDLEWARE = [
@@ -53,10 +54,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'api.middleware.RequestExposerMiddleware'
+    'api.middleware.RequestExposerMiddleware',
+     'django_user_agents.middleware.UserAgentMiddleware',
+    
 ]
 
+import os
+
 ROOT_URLCONF = 'url_shortner.urls'
+GEOIP_PATH =os.path.join(BASE_DIR, 'geoip')
+print(BASE_DIR)
+
 
 TEMPLATES = [
     {
