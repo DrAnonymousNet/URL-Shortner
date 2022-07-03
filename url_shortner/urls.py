@@ -30,6 +30,9 @@ router.register('links', LinkViewSet)
 app_name = "api"
 
 urlpatterns_v1 = [
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    re_path(r'^docs/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', include(router.urls)),
     path('api-token-auth/', views.obtain_auth_token),
     path('users/', UserRegisterView.as_view(), name="user-create"),
