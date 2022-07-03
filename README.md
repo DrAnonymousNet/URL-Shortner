@@ -24,37 +24,10 @@
   11. Make migrations: <br> ```$ python manage.py migrate```
   12. Run the development server: <br> ```$ python manage.py runserver```
   
-  ## File Tree
+  
   
 
 
-```
 
-url_shortner/
-
-├── api
-│   ├── admin.py
-│   ├── apps.py
-│   ├── __init__.py
-│   ├── migrations
-│   │   └── __init__.py
-│   ├── models.py
-│   ├── tests.py
-│   └── views.py
-├── manage.py
-├── requirements.txt
-└── url_shortner
-    ├── .env
-    ├── asgi.py
-    ├── __init__.py
-    ├── __pycache__
-    │   ├── __init__.cpython-38.pyc
-    │   └── settings.cpython-38.pyc
-    ├── settings.py
-    ├── urls.py
-    └── wsgi.py
-
-  
-  ```
 
 
