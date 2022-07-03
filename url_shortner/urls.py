@@ -4,6 +4,25 @@ from rest_framework.authtoken import views
 from rest_framework import routers
 
 from api.views import LinkViewSet, RedirectView, UserRegisterView
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="GoWithEase API",
+      default_version='v1',
+      description="GoWithEase API description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+   authentication_classes=[JWTAuthentication]
+)
+
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register('links', LinkViewSet)
