@@ -9,18 +9,8 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import F
-from rest_framework.decorators import api_view
+from .analytics_helper import *
 
-from django.contrib.gis.geoip2 import GeoIP2
-from django_user_agents.utils import get_user_agent
-
-@api_view(http_method_names=["get"])
-def my_view(request):
-  
-    user_agent = get_user_agent(request)
-    print(request.META.get("HTTP_REFERER"))
-    return Response({"browser":user_agent.browser, "device":user_agent.device, 
-    "os":user_agent.os})
 
 class UserRegisterView(APIView):
     serializer_class = UserRegisterSerializer
@@ -29,6 +19,7 @@ class UserRegisterView(APIView):
     def post(self, request, *args, **kwargs) -> Response:
         serializer = UserRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
 
         user = serializer.save()
 
@@ -49,6 +40,10 @@ class LinkViewSet(viewsets.ModelViewSet):
     queryset = Link.objects.all()
     http_method_names = ["get", "post", "delete", "patch"]
 
+    def list(self, request, *args, **kwargs):
+        print(request.META)
+        return super().list(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             owner = request.user
@@ -56,7 +51,7 @@ class LinkViewSet(viewsets.ModelViewSet):
             owner = None
         serializer = LinkSerializer(data=request.data, context={"request":request})
         serializer.is_valid(raise_exception=True)
-        serializer.save(owner = owner)
+        instance= serializer.save(owner = owner)
         response = Response(serializer.data, status=status.HTTP_201_CREATED)
         url = request.build_absolute_uri(reverse("link-detail",request=request, kwargs = {"pk":response.data.get("id")}))
         response.headers["Location"] = url
@@ -77,13 +72,13 @@ class RedirectView(APIView):
     authentication_classes = []
 
     def get(self, request:HttpRequest, **kwargs):
-        print(request.META.get("HTTP_REFERER"))
         short_link = kwargs.get("str")
         try:
             user = request.user if request.user.is_authenticated else None
             link = Link.objects.get(short_link__contains=short_link)
         except Http404:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
+        update_analytic(request, link)
         link.visit_count = F("visit_count") + 1
         link.save()
         long_link = link.long_link

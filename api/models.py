@@ -1,16 +1,20 @@
 from calendar import calendar
+from ipaddress import ip_address
 from itertools import count
+from os import device_encoding
 
 from django.db import models
 from django.utils .translation import gettext as _
 from django.contrib.auth import get_user_model
-from django.db.models import F
+from django.db.models import F, Sum
 from datetime import datetime, timedelta
+
+from pytz import country_names
 from .hash_generator import random_md5
 import dateutil.tz
-from django.http import request
+from django.http import HttpRequest, request
 from .analytic import *
-from django.db.models.functions import Cast
+
 
 
 
@@ -25,12 +29,25 @@ class LinkManager(models.Manager):
         tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
         return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 1))
 
+     
+
+
+class AnalyticDateTimeManager(models.Manager):
+    def get_per_day_per_link(self):
+        self.values("date", "link").annotate(Sum("count"))
+
+    def get_last_30_days_per_link(self):
+        self.values("date", "link").filter(date__gte = F("date") - timedelta(days=30)).annotate(Sum("count"))
+
+    def get_last_7_days_per_link(self):
+        AnalyticByDateTime.objects.values("date", "link").filter(date__gte = F("date") - timedelta(days=7)).annotate(Sum("count"))
+
     
-        
-    
+    datetime.now().date().isocalendar()
+
 
 class Link(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.URLField(_("Long link"), blank=False, null=False)
     last_visited_date = models.DateField(_("last visited"), auto_now=True, editable=False)
@@ -52,13 +69,6 @@ class Link(models.Model):
     def __str__(self) -> str:
         return self.short_link
 
-
-
-class AnalyticManager(models.Manager):
-    def get_by_24(self):
-        return self.annotate(month = Cast("date_time__month", models.TextField())).filter(month__contains = "July")
-    
-
     
 class Analytic(models.Model):
     link = models.OneToOneField(Link, on_delete=models.CASCADE)
@@ -69,25 +79,23 @@ class Analytic(models.Model):
     refer = models.JSONField(default=dict)
     # Localization
     country = models.JSONField(default=dict)
-    city = models.JSONField(default=dict)
     
-    objects = AnalyticManager()
+    #objects = AnalyticManager()
 
     def __str__(self) -> str:
         return f"Analytic for {self.link}"
 
-class AnalyticByDay(models.Model):
+
+
+    
+
+
+class AnalyticByDateTime(models.Model):
     link = models.ForeignKey(Link, on_delete=models.CASCADE)
     date = models.DateField()
-    count = models.PositiveIntegerField()
+    time = models.TimeField()
+    count = models.PositiveIntegerField(default=0)
 
-class AnalyticByHour():
-    link = models.ForeignKey(Link, on_delete=models.CASCADE)
-    time = models.DateTimeField()
-    count = models.PositiveIntegerField()
-
-class AnalyticByMonth():
-    link = models.ForeignKey(Link, on_delete=models.CASCADE)
-    month = models.DateField()
-    count = models.PositiveIntegerField()
+    def __str__(self) -> str:
+        return f"AnalyticByHour for {self.link}"
 

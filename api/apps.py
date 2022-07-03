@@ -6,5 +6,5 @@ class ApiConfig(AppConfig):
     name = 'api'
 
     def ready(self) -> None:
-        from . import job 
+        from . import signals
         return super().ready()

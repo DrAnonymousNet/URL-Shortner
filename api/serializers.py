@@ -2,7 +2,7 @@
 from rest_framework.routers import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Link
+from .models import Analytic, Link
 from .hash_generator import random_md5
 from django.db import transaction
 from rest_framework.authtoken.models import Token
@@ -83,6 +83,7 @@ class LinkSerializer(serializers.ModelSerializer):
 
         scheme = request.is_secure() and "https" or "http"
         validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link, user)[0]}'
+    
         return super().create(validated_data)
 
     def update(self, instance, validated_data):

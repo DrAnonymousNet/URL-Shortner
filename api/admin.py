@@ -4,3 +4,5 @@ from .models import *
 
 admin.site.register(Link)
 admin.site.register(Analytic)
+admin.site.register(AnalyticByDateTime)
+
