@@ -151,3 +151,45 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication']
 
 }
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+   'AUTH_HEADER_TYPES': ('JWT',),
+}
+
+AUTH_USER_MODEL = "account.UserAccount"
+
+DJOSER = {
+    "SEND_ACTIVATION_EMAIL":False,
+    "LOGIN_FIELD":"email",
+    "SEND_CONFIRMATION_EMAIL":False,
+    "USER_CREATE_PASSWORD_RETYPE":True,
+    "PASSWORD_RESET_RETYPE":True,
+    "USERNAME_RESET_CONFIRM_URL":"email/reset/{uid}/{token}",
+    "USERNAME_RESET_CONFIRM_URL":"email/reset/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL":"password/reset/{uid}/{token}",
+    "ACTIVATION_URL":"activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL":True,
+   
+}
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "haryournifemijt@gmail.com"
+EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
+EMAIL_USE_TLS = True
