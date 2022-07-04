@@ -1,17 +1,19 @@
 from .base import *
 
 
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 '''
+
 DATABASES = {
   'default': {
-    'ENGINE': 'django_psdb_engine',
+    'ENGINE': 'django.db.backends.sqlite3',#'django_psdb_engine',
     'NAME': config('DB_NAME'),
     'HOST': config('DB_HOST'),
     'PORT': config('DB_PORT'),
@@ -20,7 +22,7 @@ DATABASES = {
     'OPTIONS': {'ssl': {'ca': config('MYSQL_ATTR_SSL_CA')}}
   }
 }
-'''
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',

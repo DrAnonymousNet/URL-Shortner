@@ -1,13 +1,15 @@
 import os
 from pytz import country_names
-from .models import Analytic, AnalyticByDateTime
 from django.contrib.gis.geoip2 import GeoIP2
 from django_user_agents.utils import get_user_agent
 from geoip2.errors import AddressNotFoundError
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import transaction, models
+from .models import Analytic, AnalyticByDateTime
+
 
 from django.db.models import F, Func, Value, JSONField
+
 
 
 def update_analytic(request, link):
@@ -69,6 +71,10 @@ def GetCountryData(request)-> str:
             country = "Others"
     return country
 
-    
 
-
+        
+def get_start_and_end_date():
+    date = datetime.date.today()
+    start_week = date - timedelta(date.weekday())
+    end_week = start_week + timedelta(7)
+    return start_week, end_week

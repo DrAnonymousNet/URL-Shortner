@@ -7,4 +7,3 @@ from django.db.models.signals import post_save
 def analytic_receiver(sender,instance, **kwargs):
     if kwargs["created"]:
         Analytic.objects.create(link=instance)
-        AnalyticByDateTime.objects.create(link=instance)

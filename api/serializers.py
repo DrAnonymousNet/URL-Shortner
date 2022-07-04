@@ -55,6 +55,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class LinkSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
+    analytic = serializers.SerializerMethodField()
     class Meta:
         model = Link
         fields = [
@@ -65,6 +66,7 @@ class LinkSerializer(serializers.ModelSerializer):
                   "long_link",
                   "last_visited_date",
                   "visit_count",
+                  'analytic'
                   ]
         extra_kwargs = {"owner":{
             "read_only":True,
@@ -102,5 +104,15 @@ class LinkSerializer(serializers.ModelSerializer):
     def get_owner(self, obj):
         if obj.owner is None:
             return None
-        return obj.owner.username
+        return obj.owner.email
+
+    def get_analytic(self, obj):
+        obj_analytic = obj.analyticbydatetime_set
+        analytic = {"current_month":obj_analytic.get_by_current_month(),
+                     "today_total":obj_analytic.get_today_total(),
+                     "today_by_hour":obj_analytic.get_today_by_hour(),
+                     "this_week_by_day":obj_analytic.get_this_week_by_day(),
+                     
+                     }
+        return analytic
 

@@ -34,14 +34,13 @@ class UserRegisterView(APIView):
 
 
 class LinkViewSet(viewsets.ModelViewSet):
-    authentication_classes = []
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filterset_fields = ['owner', 'visit_count']
     serializer_class = LinkSerializer
     queryset = Link.objects.all()
     http_method_names = ["get", "post", "delete", "patch"]
 
     def list(self, request, *args, **kwargs):
-        print(request.META)
         return super().list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):

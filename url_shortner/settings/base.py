@@ -30,22 +30,27 @@ DEBUG = config("DEBUG")
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    #'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #intalled APP
+'account',
     'api',
-    'rest_framework.authtoken',
+    
+
 
     # install package
     'rest_framework',
     'django_filters',
      'django_user_agents',
+     'rest_framework_simplejwt',
+     'djoser',
+     'drf_yasg',
+     'django_extensions'
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -56,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'api.middleware.RequestExposerMiddleware',
      'django_user_agents.middleware.UserAgentMiddleware',
+     #'account.middleware.GetCurrentUserMiddleware',
     
 ]
 
@@ -147,8 +153,7 @@ REST_FRAMEWORK = {
         'user': '1000/day'
     },
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication']
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication']
 
 }
 
@@ -157,7 +162,7 @@ from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-   'AUTH_HEADER_TYPES': ('JWT',),
+   'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 AUTH_USER_MODEL = "account.UserAccount"

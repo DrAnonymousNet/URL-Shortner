@@ -6,18 +6,24 @@ from os import device_encoding
 from django.db import models
 from django.utils .translation import gettext as _
 from django.contrib.auth import get_user_model
-from django.db.models import F, Sum
-from datetime import datetime, timedelta
+from django.db.models import F, Sum ,Q
+from datetime import datetime, timedelta, date
 
 from pytz import country_names
 from .hash_generator import random_md5
 import dateutil.tz
 from django.http import HttpRequest, request
-from .analytic import *
 
 
 
+def get_start_and_end_date():
+    today_date = date.today()
+    start_week = today_date - timedelta(today_date.isoweekday())
+    end_week = start_week + timedelta(7)
+    return start_week, end_week
 
+
+MONTH = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 
 User = get_user_model()
@@ -33,17 +39,24 @@ class LinkManager(models.Manager):
 
 
 class AnalyticDateTimeManager(models.Manager):
-    def get_per_day_per_link(self):
-        self.values("date", "link").annotate(Sum("count"))
 
-    def get_last_30_days_per_link(self):
-        self.values("date", "link").filter(date__gte = F("date") - timedelta(days=30)).annotate(Sum("count"))
 
-    def get_last_7_days_per_link(self):
-        AnalyticByDateTime.objects.values("date", "link").filter(date__gte = F("date") - timedelta(days=7)).annotate(Sum("count"))
+    def get_by_current_month(self):
+        return self.values("date").filter(date__month = datetime.now().date().month).annotate(Sum("count"))
+    def get_today_total(self):
+        return self.values("date").filter(date = datetime.now().date()).annotate(Sum("count"))
+    def get_today_by_hour(self):
+        return self.values("time__hour").filter(date = datetime.now().date()).annotate(Sum("count"))
+    def get_this_week_by_day(self):
+        startdate, enddate = get_start_and_end_date()
+        return self.values("date").filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
 
     
-    datetime.now().date().isocalendar()
+
+
+
+    
+    
 
 
 class Link(models.Model):
@@ -95,6 +108,8 @@ class AnalyticByDateTime(models.Model):
     date = models.DateField()
     time = models.TimeField()
     count = models.PositiveIntegerField(default=0)
+
+    objects = AnalyticDateTimeManager()
 
     def __str__(self) -> str:
         return f"AnalyticByHour for {self.link}"
