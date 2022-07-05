@@ -3,7 +3,7 @@ from django.urls import path, include, re_path
 from rest_framework.authtoken import views
 from rest_framework import routers
 
-from api.views import LinkViewSet, RedirectView, UserRegisterView
+from api.views import LinkViewSet, RedirectView, UserRegisterView, index
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -24,7 +24,7 @@ schema_view = get_schema_view(
 )
 
 
-router = routers.DefaultRouter(trailing_slash=False)
+router = routers.DefaultRouter()
 router.register('links', LinkViewSet)
 
 app_name = "api"
@@ -42,6 +42,7 @@ urlpatterns_v1 = [
 
 
 urlpatterns = [
+   path("", index, name="index"),
     path('admin/', admin.site.urls),
     re_path(r'^v1/', include((urlpatterns_v1,"api"), namespace="v1")),
     path('<str:str>', RedirectView.as_view(), name="redirect-view")

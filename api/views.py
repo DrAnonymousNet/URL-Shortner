@@ -3,6 +3,8 @@ from django.http import Http404, HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework.routers import reverse
 from rest_framework import viewsets, permissions
+
+from .filters import LinkFilter
 from .models import Link
 from .serializers import *
 from rest_framework import status, generics
@@ -12,6 +14,11 @@ from django.db.models import F
 from .analytics_helper import *
 
 
+
+def index(request):
+    return render(request, "index.html")
+
+    
 class UserRegisterView(APIView):
     serializer_class = UserRegisterSerializer
     permission_classes= []
@@ -35,7 +42,8 @@ class UserRegisterView(APIView):
 
 class LinkViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filterset_fields = ['owner', 'visit_count']
+    #filterset_fields = ['owner__email', 'visit_count', "date_created", "last_visited_date"]
+    filterset_class = LinkFilter
     serializer_class = LinkSerializer
     queryset = Link.objects.all()
     http_method_names = ["get", "post", "delete", "patch"]
@@ -55,6 +63,10 @@ class LinkViewSet(viewsets.ModelViewSet):
         url = request.build_absolute_uri(reverse("link-detail",request=request, kwargs = {"pk":response.data.get("id")}))
         response.headers["Location"] = url
         return response
+
+    def retrieve(self, request, *args, **kwargs):
+        print(kwargs, args)
+        return super().retrieve(request, *args, **kwargs)
 
 
     '''
