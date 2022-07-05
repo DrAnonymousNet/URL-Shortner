@@ -107,7 +107,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
 
     def __str__(self):
-        return self._get_full_name()
+        return self.email
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"

@@ -17,8 +17,10 @@ def update_analytic(request, link):
     with transaction.atomic():
         user_agent = get_user_agent(request)
         update_country_analytic(request, analytic)
+        update_referer_analyic(request, analytic)
         update_device_analytic(user_agent, analytic)
         update_date_time_analytic(request, link)
+
         analytic.save()
         link.save()
         
@@ -42,7 +44,8 @@ def update_date_time_analytic(request, link):
 def update_device_analytic(user_agent, analytic)-> bool:
     _os = user_agent.get_os()
     _device = user_agent.get_device()
-    _browser = user_agent.get_browser()
+    _browser = user_agent.get_browser().split(" ")[0]
+    
     _os = user_agent.get_os()
     device_count = analytic.device.setdefault(_device ,0)
     analytic.device.update({_device:device_count+1})
@@ -52,6 +55,12 @@ def update_device_analytic(user_agent, analytic)-> bool:
     analytic.os.update({_os:os_count+1})
     return True
   
+def update_referer_analyic(request, analytic):
+    _referer = request.META.get("HTTP_REFERER")
+    if _referer:
+        referer_count = analytic.referer.setdefault(_referer, 0)
+        analytic.referer.update({_referer:referer_count+1})
+
 
 def update_country_analytic(request,analytic)->bool:
     country_name = GetCountryData(request)

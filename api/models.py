@@ -2,6 +2,7 @@ from calendar import calendar
 from ipaddress import ip_address
 from itertools import count
 from os import device_encoding
+import django
 
 from django.db import models
 from django.utils .translation import gettext as _
@@ -35,7 +36,6 @@ class LinkManager(models.Manager):
         tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
         return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 1))
 
-     
 
 
 class AnalyticDateTimeManager(models.Manager):
@@ -55,17 +55,13 @@ class AnalyticDateTimeManager(models.Manager):
 
 
 
-    
-    
-
-
 class Link(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.URLField(_("Long link"), blank=False, null=False)
     last_visited_date = models.DateField(_("last visited"), auto_now=True, editable=False)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
-    
+    date_created = models.DateField(auto_now_add=True)
     objects = LinkManager()
 
     class Meta:
@@ -89,7 +85,7 @@ class Analytic(models.Model):
     device = models.JSONField(default = dict)
     os = models.JSONField(default=dict)
     browser = models.JSONField(default=dict)
-    refer = models.JSONField(default=dict)
+    referer = models.JSONField(default=dict)
     # Localization
     country = models.JSONField(default=dict)
     

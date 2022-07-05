@@ -64,6 +64,7 @@ class LinkSerializer(serializers.ModelSerializer):
                   "owner",
                   "short_link",
                   "long_link",
+                  "date_created",
                   "last_visited_date",
                   "visit_count",
                   'analytic'
@@ -112,7 +113,12 @@ class LinkSerializer(serializers.ModelSerializer):
                      "today_total":obj_analytic.get_today_total(),
                      "today_by_hour":obj_analytic.get_today_by_hour(),
                      "this_week_by_day":obj_analytic.get_this_week_by_day(),
-                     
+                     "other_analytic": {"Browser": obj.analytic.browser,
+                                        "OS":obj.analytic.os,
+                                        "Device":obj.analytic.device,
+                                        "Referer":obj.analytic.referer,
+                                        "Country":obj.analytic.country
+                                        }                     
                      }
         return analytic
 

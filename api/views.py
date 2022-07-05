@@ -75,7 +75,7 @@ class RedirectView(APIView):
         try:
             user = request.user if request.user.is_authenticated else None
             link = Link.objects.get(short_link__contains=short_link)
-        except Http404:
+        except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
         update_analytic(request, link)
         link.visit_count = F("visit_count") + 1
