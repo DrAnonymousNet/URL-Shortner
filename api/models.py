@@ -66,7 +66,7 @@ class Link(models.Model):
     objects = LinkManager()
     
     class Meta:
-        unique_together = ["owner", "long_link", "short_link"]
+        unique_together = ["owner", "short_link"]
 
 
     def save(self, **kwargs) -> None:
