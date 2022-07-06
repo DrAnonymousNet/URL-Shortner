@@ -1,5 +1,4 @@
-import os
-from pytz import country_names
+import logging
 from django.contrib.gis.geoip2 import GeoIP2
 from django_user_agents.utils import get_user_agent
 from geoip2.errors import AddressNotFoundError
@@ -9,6 +8,8 @@ from .models import Analytic, AnalyticByDateTime
 
 
 from django.db.models import F, Func, Value, JSONField
+
+logger = logging.getLogger("testlogger")
 
 
 
@@ -71,7 +72,9 @@ def update_country_analytic(request,analytic)->bool:
 
 
 def GetCountryData(request)-> str:
-    ip_address = request.META.get("HTTP-X-FORWARDED-FOR") or request.META.get("X-FORWARDED-FOR")
+    ip_address = request.META.get("HTTP_X_FORWARDED_FOR") or request.META.get("X_FORWARDED_FOR")
+    country = ""
+    print(request.META)
     if ip_address:
         try:              
             g = GeoIP2()
