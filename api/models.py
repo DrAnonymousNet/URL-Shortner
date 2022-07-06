@@ -58,14 +58,14 @@ class AnalyticDateTimeManager(models.Manager):
 class Link(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     short_link = models.URLField(_("Short link"), editable=False)
-    long_link = models.URLField(_("Long link"), blank=False, null=False, max_length=700)
+    long_link = models.URLField(_("Long link"), blank=False, null=False, max_length=255)
     last_visited_date = models.DateField(_("last visited"), auto_now=True, editable=False)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
     date_created = models.DateField(auto_now_add=True)
     objects = LinkManager()
 
     class Meta:
-        unique_together = ["owner", "short_link"]
+        unique_together = ["owner", "long_link", "short_link"]
 
 
     def save(self, **kwargs) -> None:
