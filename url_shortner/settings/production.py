@@ -10,7 +10,7 @@ DATABASES = {
     'PORT': config('DB_PORT'),
     'USER': config('DB_USER'),
     'PASSWORD': config('DB_PASSWORD'),
-    'OPTIONS': {'ssl': {'ca': config('MYSQL_ATTR_SSL_CA')}}
+    'OPTIONS': {'ssl':False}  # {'ssl': {'ca': config('MYSQL_ATTR_SSL_CA')}}
   }
 }
 
