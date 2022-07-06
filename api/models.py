@@ -80,7 +80,7 @@ class Link(models.Model):
 
     
 class Analytic(models.Model):
-    link = models.OneToOneField(Link, on_delete=models.CASCADE)
+    link = models.OneToOneField(Link, on_delete=models.CASCADE, db_constraint=False)
     #User Agent
     device = models.JSONField(default = dict)
     os = models.JSONField(default=dict)
