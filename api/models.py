@@ -57,7 +57,7 @@ class AnalyticDateTimeManager(models.Manager):
 
 
 class Link(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, db_constraint=False)
     short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.TextField(_("Long link"), blank=False, null=False, validators=[URLValidator])
     last_visited_date = models.DateField(_("last visited"), auto_now=True, editable=False)
