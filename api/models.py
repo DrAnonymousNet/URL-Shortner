@@ -65,8 +65,7 @@ class Link(models.Model):
     date_created = models.DateField(auto_now_add=True)
     objects = LinkManager()
     
-    class Meta:
-        unique_together = ["owner", "short_link"]
+
 
 
     def save(self, **kwargs) -> None:
