@@ -30,4 +30,4 @@ CACHES = {
     }
 }
 
-ALLOWED_HOSTS = ["134.122.124.219"]
+ALLOWED_HOSTS = []
