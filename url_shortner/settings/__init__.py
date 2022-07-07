@@ -3,7 +3,7 @@ from .base import *
 
 if config('ENVIRONMENT') == "PRODUCTION":
     from .production import *
-elif  config('ENVIRONMENTH') == "PRODUCTION":
+elif  config('ENVIRONMENT') == "PRODUCTIONH":
     from .productionheroku import *
 
 else:
