@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     #intalled APP
     'account',
     'api',
-    "corsheaders"
+    "corsheaders",
     
 
 
