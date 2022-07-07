@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+from corsheaders.middleware import *
 from pathlib import Path
 from decouple import config
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     #intalled APP
     'account',
     'api',
+    "corsheaders"
     
 
 
@@ -239,6 +240,7 @@ LOGGING = {
 
 CORS_ALLOWED_ORIGINS = True
 
+CORS_ORIGIN_WHITELIST = ["*"]
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -249,6 +251,7 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "*"
 ]
 
 CORS_ALLOW_METHODS = [
