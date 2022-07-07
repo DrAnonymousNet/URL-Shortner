@@ -1,5 +1,4 @@
-from . import base
-from .base import MIDDLEWARE
+from .base import *
 from decouple import config
 import django_heroku
 
