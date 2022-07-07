@@ -43,11 +43,10 @@ def update_date_time_analytic(request, link):
     return
 
 def update_device_analytic(user_agent, analytic)-> bool:
-    _os = user_agent.get_os()
-    _device = user_agent.get_device()
-    _browser = user_agent.get_browser().split(" ")[0]
     
-    _os = user_agent.get_os()
+    _device = user_agent.get_device().split(" ")[0]
+    _browser = user_agent.get_browser().split(" ")[0]
+    _os = user_agent.get_os().split(" ")[0]
     device_count = analytic.device.setdefault(_device ,0)
     analytic.device.update({_device:device_count+1})
     browser_count = analytic.browser.setdefault(_browser, 0)

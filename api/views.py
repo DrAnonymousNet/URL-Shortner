@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import F
 from .analytics_helper import *
+from .permissions import isOwner
+from django.utils import timezone
 
 
 
@@ -41,7 +43,7 @@ class UserRegisterView(APIView):
 
 
 class LinkViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    #permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     #filterset_fields = ['owner__email', 'visit_count', "date_created", "last_visited_date"]
     filterset_class = LinkFilter
     serializer_class = LinkSerializer
@@ -69,13 +71,17 @@ class LinkViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 
-    '''
+    
     def get_permissions(self):
         permission_class = []
-        if self.action in ["list","partial_update","delete","retrieve","destroy"] :
-            permission_class = [permissions.IsAuthenticated()]
+        if self.action in ["list"] :
+            permission_class += [permissions.IsAuthenticatedOrReadOnly()]
+        elif self.action in ["retrieve", "delete", "partial_update"]:
+            permission_class += [permissions.IsAdminUser(), isOwner()]
+        elif self.action in ["create"]:
+            permission_class += [permissions.AllowAny()]
         return permission_class
-    '''
+
 
 
 class RedirectView(APIView):
@@ -91,6 +97,7 @@ class RedirectView(APIView):
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
         update_analytic(request, link)
         link.visit_count = F("visit_count") + 1
+        link.last_visited_date = timezone.now()
         link.save()
         long_link = link.long_link
         

@@ -11,9 +11,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="GoWithEase API",
+      title="ShortNR API",
       default_version='v1',
-      description="GoWithEase API description",
+      description="ShortNR API description",
       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="contact@snippets.local"),
       license=openapi.License(name="BSD License"),

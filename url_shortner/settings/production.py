@@ -23,6 +23,11 @@ CACHES = {
         'KEY_PREFIX': "dev"
     }
 }
-DEBUG = True
 
-ALLOWED_HOSTS = ["134.122.124.219","*"]
+
+DEBUG = config('DEBUG', False, cast=bool)
+ALLOWED_HOSTS = ["shortenr.herokuapp.com","*"]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" 
+#STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
+django_heroku.settings(locals(),logging=False)

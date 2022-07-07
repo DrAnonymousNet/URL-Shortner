@@ -1,7 +1,4 @@
-from calendar import calendar
-from ipaddress import ip_address
-from itertools import count
-from os import device_encoding
+from decouple import config
 import django
 
 from django.db import models
@@ -33,6 +30,8 @@ User = get_user_model()
 
 class LinkManager(models.Manager):
 
+    
+
     def find_stale(self):
         tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
         return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 1))
@@ -57,10 +56,12 @@ class AnalyticDateTimeManager(models.Manager):
 
 
 class Link(models.Model):
+
+
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, db_constraint=False)
     short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.TextField(_("Long link"), blank=False, null=False)
-    last_visited_date = models.DateField(_("last visited"), auto_now=True, editable=False)
+    last_visited_date = models.DateField(_("last visited"), editable=False,null=True, default=None)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
     date_created = models.DateField(auto_now_add=True)
     objects = LinkManager()
@@ -70,7 +71,8 @@ class Link(models.Model):
 
     def save(self, **kwargs) -> None:
         if not self.short_link:
-            self.short_link = f"{request.get_host()}/{random_md5(self.long_link)[0]}"
+            HOST_NAME = config("HOST_NAME")
+            self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)[0]}"
         return super().save(**kwargs)
 
 
