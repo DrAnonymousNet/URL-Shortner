@@ -1,5 +1,7 @@
 from . import base
+from .base import MIDDLEWARE
 from decouple import config
+import django_heroku
 
 
 DATABASES = {
@@ -27,6 +29,7 @@ CACHES = {
 
 DEBUG = config('DEBUG', False, cast=bool)
 ALLOWED_HOSTS = ["shortenr.herokuapp.com","*", "134.122.124.219"]
+MIDDLEWARE += ["whitenoise.middleware.WhiteNoiseMiddleware",]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" 
 #STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
