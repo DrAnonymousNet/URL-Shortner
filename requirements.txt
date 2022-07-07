@@ -49,7 +49,6 @@ ruamel.yaml==0.17.21
 ruamel.yaml.clib==0.2.6
 whitenoise
 django-cors-headers
-django-heroku
 six==1.16.0
 social-auth-app-django==4.0.0
 social-auth-core==4.3.0
