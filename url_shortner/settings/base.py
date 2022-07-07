@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from corsheaders.middleware import *
 from pathlib import Path
 from decouple import config
-import django_heroku
+#import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,11 +58,10 @@ MIDDLEWARE = [
 
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    "corsheaders.middleware.CorsPostCsrfMiddleware"
+    "corsheaders.middleware.CorsPostCsrfMiddleware",
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -270,4 +269,5 @@ CORS_ALLOW_METHODS = [
     "PUT",
 ]
 
-django_heroku.settings(locals(),logging=False)
+#django_heroku.settings(locals(),logging=False)
+print(BASE_DIR)
