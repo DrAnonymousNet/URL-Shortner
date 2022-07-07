@@ -238,11 +238,15 @@ LOGGING = {
     }
 }
 
+from corsheaders.defaults import default_headers
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-CORS_ORIGIN_WHITELIST = ["*"]
-CORS_ALLOW_HEADERS = [
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS =True
+CSRF_TRUSTED_ORIGINS = [
+    "https://shortenr.vercel.app",
+]
+CORS_ORIGIN_WHITELIST = ["https://shortenr.vercel.app"]
+CORS_ALLOW_HEADERS = list(default_headers) + [
     "accept",
     "accept-encoding",
     "authorization",
