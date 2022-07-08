@@ -47,7 +47,7 @@ class LinkViewSet(viewsets.ModelViewSet):
     #filterset_fields = ['owner__email', 'visit_count', "date_created", "last_visited_date"]
     filterset_class = LinkFilter
     serializer_class = LinkSerializer
-    queryset = Link.objects.all()
+    queryset = Link.objects.all().select_related("analytic","owner").prefetch_related("analyticbydatetime_set")
     http_method_names = ["get", "post", "delete", "patch"]
 
     def list(self, request, *args, **kwargs):

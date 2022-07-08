@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-
+    'api.middleware.SqlPrintingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -65,7 +65,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'api.middleware.RequestExposerMiddleware',
      'django_user_agents.middleware.UserAgentMiddleware',
      #'account.middleware.GetCurrentUserMiddleware',
     
@@ -244,9 +243,8 @@ from corsheaders.defaults import default_headers
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS =True
 CSRF_TRUSTED_ORIGINS = [
-    "https://shortenr.vercel.app",
+    "https://shortenr.vercel.app","http://localhost:3000","http://127.0.0.1:3000"
 ]
-CORS_ORIGIN_WHITELIST = ["https://shortenr.vercel.app"]
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "accept",
     "accept-encoding",
@@ -269,5 +267,3 @@ CORS_ALLOW_METHODS = [
     "PUT",
 ]
 
-#django_heroku.settings(locals(),logging=False)
-print(BASE_DIR)
