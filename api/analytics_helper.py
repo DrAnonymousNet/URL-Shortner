@@ -73,7 +73,6 @@ def update_country_analytic(request,analytic)->bool:
 def GetCountryData(request)-> str:
     ip_address = request.META.get("HTTP_X_FORWARDED_FOR") or request.META.get("X_FORWARDED_FOR")
     country = ""
-    print(request.META)
     if ip_address:
         try:              
             g = GeoIP2()

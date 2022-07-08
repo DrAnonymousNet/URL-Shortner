@@ -14,6 +14,10 @@ from django.db.models import F
 from .analytics_helper import *
 from .permissions import isOwner
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger("testlogger")
+
 
 
 
@@ -89,6 +93,7 @@ class RedirectView(APIView):
     authentication_classes = []
 
     def get(self, request:HttpRequest, **kwargs):
+        logger.info(request.META)
         short_link = kwargs.get("str")
         try:
             user = request.user if request.user.is_authenticated else None
