@@ -12,16 +12,25 @@ class TestView(TestBaseView):
         
         self.assertEqual(response.status_code, 200)
 
-    def test_post_endpoint(self):
+    def test_create_endpoint(self):
         valid_data ={
             "long_link":"https://docs.djangoproject.com/en/1.10/topics/testing/tools/"
         }
         response = self.client.post("/v1/links/", data=valid_data, request=self.request)
         data = response.data
+        
         self.assertEqual(response.status_code, 201)
         self.assertEqual(data["owner"], None)
-        self.assertEqual(data["visit_count"], 0)
-        self.assertEqual()
+        self.assertEqual(data["visit_count"],0)
+        self.assertEqual(data["last_visited_date"], None)
+        response = self.client.post("/v1/links/", data=valid_data, request=self.request)
+        print(response)
+
+        self.assertEqual(response.status_code, 208)
+
+
+
+        
 
 
 

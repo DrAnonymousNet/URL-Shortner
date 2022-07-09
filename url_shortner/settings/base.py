@@ -173,7 +173,6 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = "account.UserAccount"
 
 DJOSER = {
-    "SEND_ACTIVATION_EMAIL":False,
     "LOGIN_FIELD":"email",
     "SEND_CONFIRMATION_EMAIL":False,
     "USER_CREATE_PASSWORD_RETYPE":True,
@@ -183,6 +182,9 @@ DJOSER = {
     "PASSWORD_RESET_CONFIRM_URL":"password/reset/{uid}/{token}",
     "ACTIVATION_URL":"activate/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL":True,
+    'EMAIL':{
+        "activation":"api.email_helper.ActivationEmail"
+    }
    
 }
 SWAGGER_SETTINGS = {
