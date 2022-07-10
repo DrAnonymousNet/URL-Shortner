@@ -14,7 +14,7 @@ from pathlib import Path
 from decouple import config
 #import django_heroku
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths inside the project like thisF: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -268,4 +268,11 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
+
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
 

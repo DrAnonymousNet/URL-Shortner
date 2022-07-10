@@ -1,4 +1,4 @@
-from . import base
+from .base import *
 from decouple import config
 
 
@@ -26,6 +26,9 @@ CACHES = {
 
 HOST = config("HOST")
 DEBUG = config('DEBUG', False, cast=bool)
+BROKER_URL = config("REDIS_URL")
+CELERY_RESULT_BACKEND = config("REDIS_URL")
+
 ALLOWED_HOSTS = ["shortenr.herokuapp.com","*", "134.122.124.219"]
 #STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" 
 #STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"

@@ -8,11 +8,11 @@ from .models import Analytic, AnalyticByDateTime
 
 
 from django.db.models import F, Func, Value, JSONField
-
+from url_shortner.celery import app
 logger = logging.getLogger("testlogger")
 
 
-
+@app.task
 def update_analytic(request, link):
     analytic = link.analytic
     with transaction.atomic():

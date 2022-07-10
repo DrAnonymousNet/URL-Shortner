@@ -94,13 +94,13 @@ class RedirectView(APIView):
 
     def get(self, request:HttpRequest, **kwargs):
         logger.info(request.META)
-        short_link = kwargs.get("str")
+        short_link = kwargs.get("short_link")
         try:
             user = request.user if request.user.is_authenticated else None
             link = Link.objects.get(short_link__contains=short_link)
         except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
-        update_analytic(request, link)
+        update_analytic.delay(request, link)
         link.visit_count = F("visit_count") + 1
         link.last_visited_date = timezone.now()
         link.save()
