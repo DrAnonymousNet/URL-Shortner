@@ -72,7 +72,7 @@ class Link(models.Model):
     def save(self, **kwargs) -> None:
         if not self.short_link:
             HOST_NAME = config("HOST_NAME")
-            self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)[0]}"
+            self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)}"
         return super().save(**kwargs)
 
 

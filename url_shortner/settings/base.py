@@ -51,7 +51,8 @@ INSTALLED_APPS = [
      'rest_framework_simplejwt',
      'djoser',
      'drf_yasg',
-     'django_extensions'
+     'django_extensions',
+     'django_celery_beat'
 ]
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -275,4 +276,10 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+
+
+DATABASE_ROUTERS = [
+  "url_shortner.db_router.ReplicationRouter"
+]
 

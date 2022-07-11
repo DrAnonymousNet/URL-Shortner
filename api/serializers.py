@@ -84,7 +84,7 @@ class LinkSerializer(serializers.ModelSerializer):
             raise AvailableAlready({"message":"link already exist", "short_link":link.first().short_link})
 
         scheme = request.is_secure() and "https" or "http"
-        validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link, user)[0]}'
+        validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link, user)}'
     
         return super().create(validated_data)
 
@@ -92,7 +92,7 @@ class LinkSerializer(serializers.ModelSerializer):
     
         request = self.context.get("request")
         long_link = validated_data["long_link"]
-        validated_data["short_link"] = f"{request.get_host()}/{random_md5(long_link, instance.owner)[0]}"
+        validated_data["short_link"] = f"{request.get_host()}/{random_md5(long_link, instance.owner)}"
         return super().update(instance, validated_data)
 
     def get_url(self, obj):

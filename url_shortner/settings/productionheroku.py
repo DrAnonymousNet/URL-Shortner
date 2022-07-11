@@ -12,6 +12,15 @@ DATABASES = {
     'USER': config('DB_USER'),
     'PASSWORD': config('DB_PASSWORD'),
     'OPTIONS': {'ssl': False}
+  },
+  'replica':{
+    'ENGINE': 'django_psdb_engine',
+    'NAME': config('RE_NAME'),
+    'HOST': config('RE_HOST'),
+    'PORT': config('DB_PORT'),
+    'USER': config('RE_USER'),
+    'PASSWORD': config('RE_PASSWORD'),
+    'OPTIONS': {'ssl': False}
   }
 }
 
@@ -24,6 +33,9 @@ CACHES = {
         'KEY_PREFIX': "dev"
     }
 }
+
+BROKER_URL = config("REDIS_URL")
+CELERY_RESULT_BACKEND = config("REDIS_URL")
 
 
 DEBUG = config('DEBUG', False, cast=bool)
