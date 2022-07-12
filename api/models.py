@@ -70,8 +70,11 @@ class Link(models.Model):
 
 
     def save(self, **kwargs) -> None:
-        if not self.short_link:
+        if self.request:
+            HOST_NAME = self.request.get_host()
+        else:
             HOST_NAME = config("HOST_NAME")
+        if not self.short_link:
             self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)}"
         return super().save(**kwargs)
 

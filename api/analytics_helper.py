@@ -12,7 +12,7 @@ from url_shortner.celery import app
 logger = logging.getLogger("testlogger")
 
 
-@app.task
+@app.task(name="analytic")
 def update_analytic(request, link):
     analytic = link.analytic
     with transaction.atomic():

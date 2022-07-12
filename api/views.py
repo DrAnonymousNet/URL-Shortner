@@ -100,7 +100,7 @@ class RedirectView(APIView):
             link = Link.objects.get(short_link__contains=short_link)
         except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
-        update_analytic.delay(request, link)
+        update_analytic(request, link)
         link.visit_count = F("visit_count") + 1
         link.last_visited_date = timezone.now()
         link.save()

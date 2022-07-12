@@ -12,15 +12,6 @@ DATABASES = {
     'USER': config('DB_USER'),
     'PASSWORD': config('DB_PASSWORD'),
     'OPTIONS': {'ssl': False}
-  },
-  'replica':{
-    'ENGINE': 'django_psdb_engine',
-    'NAME': config('RE_NAME'),
-    'HOST': config('RE_HOST'),
-    'PORT': config('DB_PORT'),
-    'USER': config('RE_USER'),
-    'PASSWORD': config('RE_PASSWORD'),
-    'OPTIONS': {'ssl': False}
   }
 }
 

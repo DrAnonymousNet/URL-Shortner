@@ -1,7 +1,17 @@
 
+from urllib import response
 from django.db import connection
 from django.conf import settings
+from .models import Link
 import os
+
+def ExposeModelRequestMiddleware(get_response):
+    def middleware(request):
+        Link.request = request
+        response = get_response(request)
+        return response
+    return middleware
+
 
 def terminal_width():
     """
@@ -27,7 +37,6 @@ def terminal_width():
 
 def SqlPrintingMiddleware(get_response):
     def middleware(request):
-        print("JEJECJECJ")
         response = get_response(request)
         
 

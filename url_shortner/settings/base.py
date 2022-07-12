@@ -56,7 +56,9 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    'api.middleware.SqlPrintingMiddleware',
+    #'api.middleware.SqlPrintingMiddleware',
+    'silk.middleware.SilkyMiddleware',
+    "api.middleware.ExposeModelRequestMiddleware",
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -278,8 +280,4 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
 
-
-DATABASE_ROUTERS = [
-  "url_shortner.db_router.ReplicationRouter"
-]
 
