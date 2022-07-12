@@ -20,7 +20,7 @@
 
   7. Change into the `url_shortner` directory and create a `.env` file
 
-  ```
+  
   11. Make migrations: <br> ```$ python manage.py migrate```
   12. Run the development server: <br> ```$ python manage.py runserver```
   
