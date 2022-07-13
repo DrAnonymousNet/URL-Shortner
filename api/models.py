@@ -1,15 +1,16 @@
+from operator import index
 from decouple import config
-import django
+
 
 from django.db import models
 from django.forms import Widget
 from django.utils .translation import gettext as _
 from django.contrib.auth import get_user_model
-from django.db.models import F, Sum ,Q
+from django.db.models import F, Sum ,Q, Subquery
 from datetime import datetime, timedelta, date
 
-from pytz import country_names
-from .hash_generator import random_md5
+from django.utils.functional import cached_property
+from .hash_generator import build_full_url, random_md5
 import dateutil.tz
 from django.http import HttpRequest, request
 from django.core.validators import URLValidator
@@ -40,13 +41,33 @@ class LinkManager(models.Manager):
 
 class AnalyticDateTimeManager(models.Manager):
 
+    def get_analytic(self):
+        startdate, enddate = get_start_and_end_date()
+        by_date = self.values("date")
 
+        by_current_month=by_date.filter(date__month = datetime.now().date().month).annotate(Sum("count"))
+        today_total= by_date.filter(date__month = datetime.now().date().month).annotate(Sum("count"))
+        this_week_by_day =by_date.filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
+        today_by_hour = self.values("time__hour").filter(date = datetime.now().date()).annotate(Sum("count"))
+        return {
+            "current_month":by_current_month,
+            "today_total":today_total,
+            "this_week_by_day":this_week_by_day,
+            "today_by_hour":today_by_hour
+        }
+
+    
     def get_by_current_month(self):
         return self.values("date").filter(date__month = datetime.now().date().month).annotate(Sum("count"))
+    
     def get_today_total(self):
         return self.values("date").filter(date = datetime.now().date()).annotate(Sum("count"))
+    
+    
     def get_today_by_hour(self):
         return self.values("time__hour").filter(date = datetime.now().date()).annotate(Sum("count"))
+    
+    
     def get_this_week_by_day(self):
         startdate, enddate = get_start_and_end_date()
         return self.values("date").filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
@@ -56,8 +77,6 @@ class AnalyticDateTimeManager(models.Manager):
 
 
 class Link(models.Model):
-
-
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, db_constraint=False)
     short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.TextField(_("Long link"), blank=False, null=False)
@@ -67,13 +86,19 @@ class Link(models.Model):
     objects = LinkManager()
     
 
+    class Meta:
+        indexes=[
+            models.Index(fields=["owner"])
+        ]
+
 
 
     def save(self, **kwargs) -> None:
-        if self.request:
-            HOST_NAME = self.request.get_host()
-        else:
-            HOST_NAME = config("HOST_NAME")
+        try:
+            request = self.request
+            HOST_NAME = build_full_url()
+        except:
+            HOST_NAME = f'http://{config("HOST_NAME")}'
         if not self.short_link:
             self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)}"
         return super().save(**kwargs)
@@ -99,6 +124,11 @@ class Analytic(models.Model):
     def __str__(self) -> str:
         return f"Analytic for {self.link}"
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["link"]),
+        ]
+
 
 
     
@@ -114,4 +144,10 @@ class AnalyticByDateTime(models.Model):
 
     def __str__(self) -> str:
         return f"AnalyticByHour for {self.link}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["link","date"]),
+            models.Index(fields=["link"])
+        ]
 

@@ -11,16 +11,15 @@ DATABASES = {
 }
 
 '''
-
 DATABASES = {
   'default': {
     'ENGINE': 'django_psdb_engine',
-    'NAME': config('DB_NAME'),
-    'HOST': config('DB_HOST'),
+    'NAME': config('RE_NAME'),
+    'HOST': config('RE_HOST'),
     'PORT': config('DB_PORT'),
-    'USER': config('DB_USER'),
-    'PASSWORD': config('DB_PASSWORD'),
-    'OPTIONS': {'ssl': {'ca': config('MYSQL_ATTR_SSL_CA')}}
+    'USER': config('RE_USER'),
+    'PASSWORD': config('RE_PASSWORD'),
+    'OPTIONS': {'ssl': False}
   }
 }
 '''

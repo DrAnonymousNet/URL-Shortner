@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # install package
     'rest_framework',
+    "silk",
     'django_filters',
      'django_user_agents',
      'rest_framework_simplejwt',
@@ -129,8 +130,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
+#TIME_ZONE = 'UTC'
+TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 
 USE_TZ = True
@@ -277,7 +278,15 @@ CORS_ALLOW_METHODS = [
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+CELERY_TIMEZONE = 'Africa/Lagos'
 
+CELERY_BEAT_SCHEDULE={
+    "scheduled_task":{
+        "task":"api.task.print_hello",
+        "schedule": 10.0
+    }
+
+
+}
 
 

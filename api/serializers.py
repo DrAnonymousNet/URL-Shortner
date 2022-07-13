@@ -2,7 +2,7 @@ from rest_framework.routers import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Analytic, Link
-from .hash_generator import random_md5
+from .hash_generator import random_md5,build_full_url
 from django.db import transaction
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import APIException
@@ -82,9 +82,8 @@ class LinkSerializer(serializers.ModelSerializer):
         link = Link.objects.filter(owner=user, long_link=long_link)
         if link.exists():
             raise AvailableAlready({"message":"link already exist", "short_link":link.first().short_link})
-
-        scheme = request.is_secure() and "https" or "http"
-        validated_data["short_link"] =  f'{scheme}://{request.get_host()}/{random_md5(long_link, user)}'
+        base_url = build_full_url(request)
+        validated_data["short_link"] =  f'{base_url}/{random_md5(long_link, user)}'
     
         return super().create(validated_data)
 
@@ -108,16 +107,14 @@ class LinkSerializer(serializers.ModelSerializer):
 
     def get_analytic(self, obj):
         obj_analytic = obj.analyticbydatetime_set
-        analytic = {"current_month":obj_analytic.get_by_current_month(),
-                     "today_total":obj_analytic.get_today_total(),
-                     "today_by_hour":obj_analytic.get_today_by_hour(),
-                     "this_week_by_day":obj_analytic.get_this_week_by_day(),
+        
+        analytic = {"date_time_anaylytic":obj_analytic.get_analytic(),
                      "other_analytic": {"Browser": obj.analytic.browser,
                                         "OS":obj.analytic.os,
                                         "Device":obj.analytic.device,
                                         "Referer":obj.analytic.referer,
                                         "Country":obj.analytic.country
-                                        }                     
-                     }
+                                        }   
+        }
         return analytic
 

@@ -45,6 +45,7 @@ urlpatterns = [
    path("", index, name="index"),
     path('admin/', admin.site.urls),
     re_path(r'^v1/', include((urlpatterns_v1,"api"), namespace="v1")),
+    path('silk/', include('silk.urls', namespace='silk')),
     path('<str:short_link>', RedirectView.as_view(), name="redirect-view")
 
 ]

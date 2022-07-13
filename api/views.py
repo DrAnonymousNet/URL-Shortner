@@ -15,6 +15,8 @@ from .analytics_helper import *
 from .permissions import isOwner
 from django.utils import timezone
 import logging
+from silk.profiling.profiler import silk_profile
+
 
 logger = logging.getLogger("testlogger")
 
@@ -47,7 +49,7 @@ class UserRegisterView(APIView):
 
 
 class LinkViewSet(viewsets.ModelViewSet):
-    #permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
     #filterset_fields = ['owner__email', 'visit_count', "date_created", "last_visited_date"]
     filterset_class = LinkFilter
     serializer_class = LinkSerializer
@@ -74,7 +76,7 @@ class LinkViewSet(viewsets.ModelViewSet):
         print(kwargs, args)
         return super().retrieve(request, *args, **kwargs)
 
-
+'''
     
     def get_permissions(self):
         permission_class = []
@@ -85,7 +87,7 @@ class LinkViewSet(viewsets.ModelViewSet):
         elif self.action in ["create"]:
             permission_class += [permissions.AllowAny()]
         return permission_class
-
+'''
 
 
 class RedirectView(APIView):
@@ -95,9 +97,11 @@ class RedirectView(APIView):
     def get(self, request:HttpRequest, **kwargs):
         logger.info(request.META)
         short_link = kwargs.get("short_link")
+        full_short_link = f"{build_full_url(request)}/{short_link}"
+        
         try:
             user = request.user if request.user.is_authenticated else None
-            link = Link.objects.get(short_link__contains=short_link)
+            link = Link.objects.get(short_link=full_short_link)
         except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
         update_analytic(request, link)
