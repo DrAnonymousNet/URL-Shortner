@@ -49,7 +49,7 @@ class UserRegisterView(APIView):
 
 
 class LinkViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.AllowAny]
+    #permission_classes = [permissions.AllowAny]
     #filterset_fields = ['owner__email', 'visit_count', "date_created", "last_visited_date"]
     filterset_class = LinkFilter
     serializer_class = LinkSerializer
@@ -76,8 +76,7 @@ class LinkViewSet(viewsets.ModelViewSet):
         print(kwargs, args)
         return super().retrieve(request, *args, **kwargs)
 
-'''
-    
+
     def get_permissions(self):
         permission_class = []
         if self.action in ["list"] :
@@ -87,7 +86,7 @@ class LinkViewSet(viewsets.ModelViewSet):
         elif self.action in ["create"]:
             permission_class += [permissions.AllowAny()]
         return permission_class
-'''
+
 
 
 class RedirectView(APIView):

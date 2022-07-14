@@ -35,7 +35,7 @@ class LinkManager(models.Manager):
 
     def find_stale(self):
         tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
-        return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 1))
+        return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 30))
 
 
 

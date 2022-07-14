@@ -280,13 +280,4 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Lagos'
 
-CELERY_BEAT_SCHEDULE={
-    "scheduled_task":{
-        "task":"api.task.print_hello",
-        "schedule": 10.0
-    }
-
-
-}
-
 
