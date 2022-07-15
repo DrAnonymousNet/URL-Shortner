@@ -82,7 +82,7 @@ class LinkViewSet(viewsets.ModelViewSet):
         if self.action in ["list"] :
             permission_class += [permissions.IsAuthenticatedOrReadOnly()]
         elif self.action in ["retrieve", "delete", "partial_update"]:
-            permission_class += [permissions.IsAdminUser(), isOwner()]
+            permission_class += [isOwner()]
         elif self.action in ["create"]:
             permission_class += [permissions.AllowAny()]
         return permission_class
