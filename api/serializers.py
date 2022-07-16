@@ -118,3 +118,8 @@ class LinkSerializer(serializers.ModelSerializer):
         }
         return analytic
 
+    def to_internal_value(self, data):
+        long_link = data.get("long_link")
+        if len(long_link) > 255:
+            raise serializers.ValidationError("Link cannot be greater than 255")
+        return super().to_internal_value(data)
