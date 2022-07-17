@@ -43,9 +43,10 @@ def update_date_time_analytic(request, link):
     return
 
 def update_device_analytic(user_agent, analytic)-> bool:    
-    _browser = user_agent.get_browser().split(" ")[0]
+    _browser:str = user_agent.get_browser() #.split(" ")[0]
 
-    if _browser in FLAGGED_AGENT:
+    if _browser in FLAGGED_AGENT or "bot" in _browser.lower():
+        print("THIS WERE NOT ALLOWED\n\n\n\n\n")
         logger.info(_browser)
         return False
     logger.info("This Were ALLOWED")
