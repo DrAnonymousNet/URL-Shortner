@@ -11,7 +11,7 @@ from django.db.models import F, Func, Value, JSONField
 from url_shortner.celery import app
 logger = logging.getLogger("testlogger")
 
-FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "TwitterBot"]
+FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "Twitterbot"]
 
 @app.task(name="analytic")
 def update_analytic(request, link):
@@ -44,9 +44,12 @@ def update_date_time_analytic(request, link):
 
 def update_device_analytic(user_agent, analytic)-> bool:    
     _browser = user_agent.get_browser().split(" ")[0]
+
     if _browser in FLAGGED_AGENT:
         logger.info(_browser)
         return False
+    logger.info("This Were ALLOWED")
+    logger.info(_browser)
     _device = user_agent.get_device().split(" ")[0]
     _os = user_agent.get_os().split(" ")[0]
     device_count = analytic.device.setdefault(_device ,0)
