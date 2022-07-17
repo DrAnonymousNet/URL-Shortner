@@ -11,22 +11,22 @@ from django.db.models import F, Func, Value, JSONField
 from url_shortner.celery import app
 logger = logging.getLogger("testlogger")
 
+FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client"]
 
 @app.task(name="analytic")
 def update_analytic(request, link):
     analytic = link.analytic
     with transaction.atomic():
         user_agent = get_user_agent(request)
-        update_country_analytic(request, analytic)
-        update_referer_analyic(request, analytic)
-        update_device_analytic(user_agent, analytic)
-        update_date_time_analytic(request, link)
-
-        analytic.save()
-        link.save()
-        
-        #updated_analytic.country.setdefault(country_name, #country_count
-    
+        status = update_device_analytic(user_agent, analytic)
+        if status:
+            update_country_analytic(request, analytic)
+            update_referer_analyic(request, analytic)
+            update_date_time_analytic(request, link)
+            analytic.save()
+            link.save()
+        else:
+            return False
     return True
     
 
@@ -45,6 +45,8 @@ def update_date_time_analytic(request, link):
 def update_device_analytic(user_agent, analytic)-> bool:
     
     _device = user_agent.get_device().split(" ")[0]
+    if _device in FLAGGED_AGENT:
+        return False
     _browser = user_agent.get_browser().split(" ")[0]
     _os = user_agent.get_os().split(" ")[0]
     device_count = analytic.device.setdefault(_device ,0)
@@ -71,7 +73,7 @@ def update_country_analytic(request,analytic)->bool:
 
 
 def GetCountryData(request)-> str:
-    ip_address = request.META.get("HTTP_X_FORWARDED_FOR") or request.META.get("X_FORWARDED_FOR")
+    ip_address = request.META.get("HTTP_X_FORWARDED_FOR")
     country = ""
     if ip_address:
         try:              
