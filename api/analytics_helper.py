@@ -11,7 +11,7 @@ from django.db.models import F, Func, Value, JSONField
 from url_shortner.celery import app
 logger = logging.getLogger("testlogger")
 
-FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "Twitterbot"]
+FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "Twitterbot", "TelegramBot"]
 
 @app.task(name="analytic")
 def update_analytic(request, link):
