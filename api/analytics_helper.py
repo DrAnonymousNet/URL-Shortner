@@ -109,7 +109,7 @@ def is_blacklisted(request):
 def get_browser(user_agent):
     _browser:str = user_agent.get_browser().split(" ")
     if len(_browser) > 2:
-        _browser = "".join(_browser[:2])
+        _browser = " ".join(_browser[:2])
     else:
         _browser = _browser[0]
 
