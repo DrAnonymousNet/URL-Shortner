@@ -74,7 +74,7 @@ def update_country_analytic(request,analytic)->bool:
     referer = request.META.get("HTTP_REFERER")
 
     country_name = GetCountryData(request)
-    if countries.lower() in countries and referer== "https://t.co/":
+    if country_name.lower() in countries and referer== "https://t.co/":
         return False
     country_count =analytic.country.setdefault(country_name, 0)
     analytic.country.update({country_name:country_count+1})
