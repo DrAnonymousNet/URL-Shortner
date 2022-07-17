@@ -18,9 +18,10 @@ def update_analytic(request, link):
     analytic = link.analytic
     with transaction.atomic():
         user_agent = get_user_agent(request)
-        status = update_device_analytic(user_agent, analytic)
-        if status:
-            update_country_analytic(request, analytic)
+        not_is_robot = update_device_analytic(user_agent, analytic)
+        ip_not_crawler = update_country_analytic(request, analytic)
+
+        if not_is_robot and ip_not_crawler:
             update_referer_analyic(request, analytic)
             update_date_time_analytic(request, link)
             analytic.save()
@@ -77,12 +78,17 @@ def update_country_analytic(request,analytic)->bool:
 
 
 def GetCountryData(request)-> str:
+    countries = ["canada", "united states", "sweden", "finland", "united kingdom"]
     ip_address = request.META.get("HTTP_X_FORWARDED_FOR")
+    referer = request.META.get("HTTP_REFERER")
     country = ""
     if ip_address:
         try:              
             g = GeoIP2()
             country = g.country_name(ip_address)
+
+            if country.lower() in countries and referer== "https://t.co/":
+                return False
         except AddressNotFoundError:
             country = "Others"
     return country
@@ -96,11 +102,7 @@ def get_start_and_end_date():
     return start_week, end_week
 
 def is_blacklisted(request):
-    address = ["165.55.232.163","34.105.82.208","94.130.167.113","94.130.167.114", "51.79.77.165"]
-    if request.META.get("HTTP_X_FORWARDED_FOR") in address:
-        return True
     RAW_URI = request.META.get("RAW_URI")
-    
     if "robot" in RAW_URI.lower():
         return True
     return False
