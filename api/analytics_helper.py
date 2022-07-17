@@ -94,3 +94,13 @@ def get_start_and_end_date():
     start_week = date - timedelta(date.weekday())
     end_week = start_week + timedelta(7)
     return start_week, end_week
+
+def is_blacklisted(request):
+    address = ["165.55.232.163","34.105.82.208","94.130.167.113","94.130.167.114", "51.79.77.165"]
+    if request.META.get("HTTP_X_FORWARDED_FOR") in address:
+        return True
+    RAW_URI = request.META.get("RAW_URI")
+    
+    if "robot" in RAW_URI.lower():
+        return True
+    return False

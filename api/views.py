@@ -16,7 +16,7 @@ from .permissions import isOwner
 from django.utils import timezone
 import logging
 from silk.profiling.profiler import silk_profile
-
+from analytics_helper import is_blacklisted
 
 logger = logging.getLogger("testlogger")
 
@@ -88,7 +88,6 @@ class LinkViewSet(viewsets.ModelViewSet):
         return permission_class
 
 
-
 class RedirectView(APIView):
     permission_classes = []
     authentication_classes = []
@@ -103,7 +102,7 @@ class RedirectView(APIView):
             link = Link.objects.get(short_link=full_short_link)
         except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
-        if update_analytic(request, link):
+        if not is_blacklisted(request) and update_analytic(request, link):
             link.visit_count = F("visit_count") + 1
             link.last_visited_date = timezone.now()
             link.save()
