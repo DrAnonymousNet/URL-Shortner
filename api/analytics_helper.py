@@ -45,6 +45,7 @@ def update_date_time_analytic(request, link):
 def update_device_analytic(user_agent, analytic)-> bool:    
     _browser = user_agent.get_browser().split(" ")[0]
     if _browser in FLAGGED_AGENT:
+        logger.info(_browser)
         return False
     _device = user_agent.get_device().split(" ")[0]
     _os = user_agent.get_os().split(" ")[0]
