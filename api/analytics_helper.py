@@ -70,7 +70,12 @@ def update_referer_analyic(request, analytic):
 
 
 def update_country_analytic(request,analytic)->bool:
+    countries = ["canada", "united states", "sweden", "finland", "united kingdom"]
+    referer = request.META.get("HTTP_REFERER")
+
     country_name = GetCountryData(request)
+    if countries.lower() in countries and referer== "https://t.co/":
+        return False
     country_count =analytic.country.setdefault(country_name, 0)
     analytic.country.update({country_name:country_count+1})
     return True
@@ -78,17 +83,12 @@ def update_country_analytic(request,analytic)->bool:
 
 
 def GetCountryData(request)-> str:
-    countries = ["canada", "united states", "sweden", "finland", "united kingdom"]
     ip_address = request.META.get("HTTP_X_FORWARDED_FOR")
-    referer = request.META.get("HTTP_REFERER")
     country = ""
     if ip_address:
         try:              
             g = GeoIP2()
             country = g.country_name(ip_address)
-
-            if country.lower() in countries and referer== "https://t.co/":
-                return False
         except AddressNotFoundError:
             country = "Others"
     return country
