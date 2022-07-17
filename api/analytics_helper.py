@@ -1,4 +1,5 @@
 import logging
+from re import U
 from django.contrib.gis.geoip2 import GeoIP2
 from django_user_agents.utils import get_user_agent
 from geoip2.errors import AddressNotFoundError
@@ -43,14 +44,12 @@ def update_date_time_analytic(request, link):
     curr.save()
     return
 
-def update_device_analytic(user_agent, analytic)-> bool:    
-    _browser:str = user_agent.get_browser() #.split(" ")[0]
 
+def update_device_analytic(user_agent, analytic)-> bool:    
+    _browser:str = get_browser(user_agent)
     if _browser in FLAGGED_AGENT or "bot" in _browser.lower():
-        print("THIS WERE NOT ALLOWED\n\n\n\n\n")
         logger.info(_browser)
         return False
-    logger.info("This Were ALLOWED")
     logger.info(_browser)
     _device = user_agent.get_device().split(" ")[0]
     _os = user_agent.get_os().split(" ")[0]
@@ -106,3 +105,12 @@ def is_blacklisted(request):
     if "robot" in RAW_URI.lower():
         return True
     return False
+
+def get_browser(user_agent):
+    _browser:str = user_agent.get_browser().split(" ")
+    if len(_browser) > 2:
+        _browser = "".join(_browser[:2])
+    else:
+        _browser = _browser[0]
+
+    return _browser
