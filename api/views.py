@@ -16,7 +16,7 @@ from .permissions import isOwner
 from django.utils import timezone
 import logging
 from silk.profiling.profiler import silk_profile
-from analytics_helper import is_blacklisted
+from .analytics_helper import is_blacklisted
 
 logger = logging.getLogger("testlogger")
 
