@@ -48,9 +48,9 @@ def update_date_time_analytic(request, link):
 def update_device_analytic(user_agent, analytic)-> bool:    
     _browser:str = get_browser(user_agent)
     if _browser in FLAGGED_AGENT or "bot" in _browser.lower():
-        logger.info(_browser)
+        #logger.info(_browser)
         return False
-    logger.info(_browser)
+    #logger.info(_browser)
     _device = user_agent.get_device().split(" ")[0]
     _os = user_agent.get_os().split(" ")[0]
     device_count = analytic.device.setdefault(_device ,0)

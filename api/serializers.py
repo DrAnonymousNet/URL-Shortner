@@ -11,6 +11,9 @@ from rest_framework import status
 class AvailableAlready(APIException):
     status_code = status.HTTP_208_ALREADY_REPORTED
 
+class LinkTooLong(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+
 
 User = get_user_model()
 
@@ -120,6 +123,7 @@ class LinkSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         long_link = data.get("long_link")
+        print(long_link, "\n", len(long_link))
         if len(long_link) > 255:
-            raise serializers.ValidationError("Link cannot be greater than 255")
+            raise LinkTooLong({"error":"Link cannot be greater than 255"})
         return super().to_internal_value(data)
