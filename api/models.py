@@ -80,7 +80,7 @@ class AnalyticDateTimeManager(models.Manager):
 class Link(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, db_constraint=False)
     short_link = models.URLField(_("Short link"), editable=False)
-    long_link = models.TextField(_("Long link"), blank=False, null=False, validators=[URLValidator])
+    long_link = models.TextField(_("Long link"), blank=False, null=False, max_length=1000, validators=[URLValidator])
     last_visited_date = models.DateField(_("last visited"), editable=False,null=True, default=None)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
     date_created = models.DateField(auto_now_add=True)
@@ -89,7 +89,8 @@ class Link(models.Model):
 
     class Meta:
         indexes=[
-            models.Index(fields=["owner"])
+            models.Index(fields=["owner"]),
+            models.Index(fields=["short_link"])
         ]
 
 
