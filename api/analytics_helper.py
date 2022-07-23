@@ -87,6 +87,7 @@ def GetCountryData(request)-> str:
     if ip_address:
         try:              
             g = GeoIP2()
+            print(ip_address)
             country = g.country_name(ip_address)
         except AddressNotFoundError:
             country = "Others"
