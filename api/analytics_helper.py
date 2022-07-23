@@ -6,7 +6,7 @@ from geoip2.errors import AddressNotFoundError
 from datetime import datetime, timedelta
 from django.db import transaction, models
 from .models import Analytic, AnalyticByDateTime
-
+from typing import List
 
 from django.db.models import F, Func, Value, JSONField
 from url_shortner.celery import app
@@ -82,13 +82,19 @@ def update_country_analytic(request,analytic)->bool:
 
 
 def GetCountryData(request)-> str:
-    ip_address = request.META.get("HTTP_X_FORWARDED_FOR")
+    ip_address : str = request.META.get("HTTP_X_FORWARDED_FOR")
+    ip_list: List = ip_address.split(", ")
+    if len(ip_list) > 1:
+        ip_address = ip_list[0]
     country = ""
     if ip_address:
         try:              
             g = GeoIP2()
             print(ip_address)
             country = g.country_name(ip_address)
+            country_2 = g.country_name(ip_list[1])
+            print(country, country_2)
+
         except AddressNotFoundError:
             country = "Others"
     return country
