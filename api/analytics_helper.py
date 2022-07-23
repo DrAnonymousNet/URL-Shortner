@@ -94,7 +94,7 @@ def GetCountryData(request)-> str:
             country = g.country_name(ip_address)
             if len(ip_list) > 1:
                 country_2 = g.country_name(ip_list[1])
-            print(country, country_2)
+                print(country, country_2)
 
         except AddressNotFoundError:
             country = "Others"
