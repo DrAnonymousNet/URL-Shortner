@@ -82,7 +82,7 @@ def update_country_analytic(request,analytic)->bool:
 
 
 def GetCountryData(request)-> str:
-    ip_address : str = request.META.get("HTTP_X_FORWARDED_FOR")
+    ip_address : str = request.META.get("HTTP_X_FORWARDED_FOR", "none")
     ip_list: List = ip_address.split(", ")
     if len(ip_list) > 1:
         ip_address = ip_list[0]
@@ -90,13 +90,12 @@ def GetCountryData(request)-> str:
     if ip_address:
         try:              
             g = GeoIP2()
-            print(ip_address)
             country = g.country_name(ip_address)
             if len(ip_list) > 1:
                 country_2 = g.country_name(ip_list[1])
                 print(country, country_2)
 
-        except AddressNotFoundError:
+        except:
             country = "Others"
     return country
 
@@ -109,17 +108,17 @@ def get_start_and_end_date():
     return start_week, end_week
 
 def is_blacklisted(request):
-    RAW_URI = request.META.get("RAW_URI")
+    RAW_URI = request.META.get("RAW_URI", "none")
     if "robot" in RAW_URI.lower():
         return True
     return False
 
 def get_browser(user_agent):
     _browser:str = user_agent.get_browser() #.split(" ")
-    if len(_browser) > 2:
+    print(_browser)
+    if len(_browser) > 2 and isinstance(_browser, List):
         _browser = " ".join(_browser[:2])
     else:
         _browser = _browser[0]
-    print("KCWCKO", _browser)
 
     return _browser
