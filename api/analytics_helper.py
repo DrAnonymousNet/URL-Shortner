@@ -63,6 +63,10 @@ def update_device_analytic(user_agent, analytic)-> bool:
   
 def update_referer_analyic(request, analytic):
     _referer = request.META.get("HTTP_REFERER")
+    user_agent = get_user_agent(request)
+    browser = get_browser(user_agent)
+    if browser.lower() == "whatsapp" and not _referer:
+        _referer = "WhatsApp"
     if _referer:
         referer_count = analytic.referer.setdefault(_referer, 0)
         analytic.referer.update({_referer:referer_count+1})
@@ -114,8 +118,7 @@ def is_blacklisted(request):
     return False
 
 def get_browser(user_agent):
-    _browser:str = user_agent.get_browser() #.split(" ")
-    print(_browser)
+    _browser:str = user_agent.get_browser().split(" ")
     if len(_browser) > 2 and isinstance(_browser, List):
         _browser = " ".join(_browser[:2])
     else:
