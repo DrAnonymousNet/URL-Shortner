@@ -120,5 +120,6 @@ def get_browser(user_agent):
         _browser = " ".join(_browser[:2])
     else:
         _browser = _browser[0]
+    print("KCWCKO", _browser)
 
     return _browser
