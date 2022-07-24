@@ -75,8 +75,6 @@ class AnalyticDateTimeManager(models.Manager):
 
     
 
-
-
 class Link(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, db_constraint=False)
     short_link = models.URLField(_("Short link"), editable=False)

@@ -178,6 +178,7 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = "account.UserAccount"
 
 DJOSER = {
+    'TOKEN_MODEL':None,
     "LOGIN_FIELD":"email",
     "SEND_CONFIRMATION_EMAIL":False,
     "USER_CREATE_PASSWORD_RETYPE":True,
