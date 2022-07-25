@@ -7,7 +7,6 @@ def random_md5(url, owner=None):
     hash = hashes.hexdigest()[:6]
     return hash
 
-
 def build_full_url(request):
     scheme = request.is_secure() and "https" or "http"
     base_url = f'{scheme}://{request.get_host()}'

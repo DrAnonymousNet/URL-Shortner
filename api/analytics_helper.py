@@ -1,15 +1,12 @@
 import logging
-from re import U
 from django.contrib.gis.geoip2 import GeoIP2
 from django_user_agents.utils import get_user_agent
-from geoip2.errors import AddressNotFoundError
 from datetime import datetime, timedelta
 from django.db import transaction, models
-from .models import Analytic, AnalyticByDateTime
 from typing import List
-
-from django.db.models import F, Func, Value, JSONField
 from url_shortner.celery import app
+
+
 logger = logging.getLogger("testlogger")
 
 FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "Twitterbot", "TelegramBot"]
@@ -48,7 +45,6 @@ def update_date_time_analytic(request, link):
 def update_device_analytic(user_agent, analytic)-> bool:    
     _browser:str = get_browser(user_agent)
     if _browser in FLAGGED_AGENT or "bot" in _browser.lower():
-        #logger.info(_browser)
         return False
     #logger.info(_browser)
     _device = user_agent.get_device().split(" ")[0]
@@ -61,6 +57,7 @@ def update_device_analytic(user_agent, analytic)-> bool:
     analytic.os.update({_os:os_count+1})
     return True
   
+
 def update_referer_analyic(request, analytic):
     _referer = request.META.get("HTTP_REFERER")
     user_agent = get_user_agent(request)
@@ -83,7 +80,6 @@ def update_country_analytic(request,analytic)->bool:
     analytic.country.update({country_name:country_count+1})
     return True
    
-
 
 def GetCountryData(request)-> str:
     ip_address : str = request.META.get("HTTP_X_FORWARDED_FOR", "none")

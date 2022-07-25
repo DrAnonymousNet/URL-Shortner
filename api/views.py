@@ -15,37 +15,14 @@ from .analytics_helper import *
 from .permissions import isOwner
 from django.utils import timezone
 import logging
-from silk.profiling.profiler import silk_profile
 from .analytics_helper import is_blacklisted
+
 
 logger = logging.getLogger("testlogger")
 
 
-
-
 def index(request):
     return render(request, "index.html")
-
-    
-class UserRegisterView(APIView):
-    serializer_class = UserRegisterSerializer
-    permission_classes= []
-
-    def post(self, request, *args, **kwargs) -> Response:
-        serializer = UserRegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-
-        user = serializer.save()
-
-        response = Response(serializer.data, status=status.HTTP_201_CREATED, content_type='application/json')
-        response.headers["Location"] = ""
-        response.data["Token"] = user.auth_token.key
-        return response
-
-    
-    
-
 
 
 class LinkViewSet(viewsets.ModelViewSet):
@@ -111,4 +88,23 @@ class RedirectView(APIView):
         return redirect(long_link)
 
     
+'''  
+class UserRegisterView(APIView):
+    serializer_class = UserRegisterSerializer
+    permission_classes= []
+
+    def post(self, request, *args, **kwargs) -> Response:
+        serializer = UserRegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+
+        user = serializer.save()
+
+        response = Response(serializer.data, status=status.HTTP_201_CREATED, content_type='application/json')
+        response.headers["Location"] = ""
+        response.data["Token"] = user.auth_token.key
+        return response
+   ''' 
+
+
 

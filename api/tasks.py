@@ -10,9 +10,6 @@ def clean_stale():
     stale = Link.objects.find_stale()
     stale.delete()
 
-@app.task
-def print_hello():
-    print("Hello World")
 
 #celery -A url_shortner beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     

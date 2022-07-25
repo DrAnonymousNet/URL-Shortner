@@ -1,11 +1,10 @@
-
-from urllib import response
 from django.db import connection
-from django.conf import settings
 from .models import Link
 import os
 
+
 def ExposeModelRequestMiddleware(get_response):
+    """Middleware to expose the request in the model"""
     def middleware(request):
         Link.request = request
         response = get_response(request)
@@ -36,10 +35,9 @@ def terminal_width():
 
 
 def SqlPrintingMiddleware(get_response):
+    """Middleware to view he SQL queries in the command line"""
     def middleware(request):
         response = get_response(request)
-        
-
         indentation = 2
         print("\n\n%s\033[1;35m[SQL Queries for]\033[1;34m %s\033[0m\n" % (" " * indentation, request.path_info))
         width = terminal_width()

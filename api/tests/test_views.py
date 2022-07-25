@@ -1,9 +1,3 @@
-
-from urllib import response
-from rest_framework.test import APITestCase, URLPatternsTestCase, force_authenticate
-from rest_framework.routers import reverse
-from ..views import LinkViewSet 
-from django.urls import include, path, resolve
 from .test_base import TestBaseView
 
 class TestView(TestBaseView):
@@ -43,13 +37,6 @@ class TestView(TestBaseView):
         response = self.client.delete(self.link_detail_url, follow=True)
         print(response)
         self.assertEqual(response.status_code, 200)
-
-
-
-
-
-        
-
 
 
     #def test_link_detail_url(self):

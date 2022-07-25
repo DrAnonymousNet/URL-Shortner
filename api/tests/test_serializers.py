@@ -1,4 +1,3 @@
-from yaml import serialize
 from ..serializers import LinkSerializer
 from .test_base import TestBaseView
 

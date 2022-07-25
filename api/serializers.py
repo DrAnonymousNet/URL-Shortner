@@ -1,22 +1,88 @@
 from rest_framework.routers import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Analytic, Link
+from .models import Link
 from .hash_generator import random_md5,build_full_url
 from django.db import transaction
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import APIException
-from rest_framework import status
-
-class AvailableAlready(APIException):
-    status_code = status.HTTP_208_ALREADY_REPORTED
-
-class LinkTooLong(APIException):
-    status_code = status.HTTP_400_BAD_REQUEST
+from .exceptions import *
 
 
 User = get_user_model()
 
+class LinkSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
+    analytic = serializers.SerializerMethodField()
+    class Meta:
+        model = Link
+        fields = [
+                  "url",
+                  "id",
+                  "owner",
+                  "short_link",
+                  "long_link",
+                  "date_created",
+                  "last_visited_date",
+                  "visit_count",
+                  'analytic'
+                  ]
+        extra_kwargs = {"owner":{
+            "read_only":True,}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        long_link = validated_data["long_link"]
+        user = request.user if request.user.is_authenticated else None
+        link = Link.objects.filter(owner=user, long_link=long_link)
+        if link.exists():
+            raise AvailableAlready({"message":"link already exist", "short_link":link.first().short_link})
+        base_url = build_full_url(request)
+        validated_data["short_link"] =  f'{base_url}/{random_md5(long_link, user)}'
+    
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        long_link = validated_data["long_link"]
+        validated_data["short_link"] = f"{request.get_host()}/{random_md5(long_link, instance.owner)}"
+        return super().update(instance, validated_data)
+
+    def get_url(self, obj):
+        request = self.context.get("request")
+        url = reverse("link-detail", request=request, kwargs={"pk":obj.id})
+        return url
+
+    def get_owner(self, obj):
+        if obj.owner is None:
+            return None
+        return obj.owner.email
+
+    def get_analytic(self, obj):
+        obj_analytic = obj.analyticbydatetime_set
+        
+        analytic = {"date_time_anaylytic":obj_analytic.get_analytic(),
+                     "other_analytic": {"Browser": obj.analytic.browser,
+                                        "OS":obj.analytic.os,
+                                        "Device":obj.analytic.device,
+                                        "Referer":obj.analytic.referer,
+                                        "Country":obj.analytic.country
+                                        }   
+        }
+        return analytic
+
+    def to_internal_value(self, data):
+        long_link = data.get("long_link")
+        print(long_link, "\n", len(long_link))
+        if len(long_link) > 255:
+            raise LinkTooLong({"error":"Link cannot be greater than 255"})
+        return super().to_internal_value(data)
+
+
+
+
+'''
 class UserRegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only = True)
     
@@ -52,78 +118,5 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             
         return user
 
+'''
 
-
-class LinkSerializer(serializers.ModelSerializer):
-    url = serializers.SerializerMethodField()
-    owner = serializers.SerializerMethodField()
-    analytic = serializers.SerializerMethodField()
-    class Meta:
-        model = Link
-        fields = [
-                  "url",
-                  "id",
-                  "owner",
-                  "short_link",
-                  "long_link",
-                  "date_created",
-                  "last_visited_date",
-                  "visit_count",
-                  'analytic'
-                  ]
-        extra_kwargs = {"owner":{
-            "read_only":True,
-        }
-        
-        }
-
-    def create(self, validated_data):
-        request = self.context.get("request")
-
-        long_link = validated_data["long_link"]
-        user = request.user if request.user.is_authenticated else None
-        link = Link.objects.filter(owner=user, long_link=long_link)
-        if link.exists():
-            raise AvailableAlready({"message":"link already exist", "short_link":link.first().short_link})
-        base_url = build_full_url(request)
-        validated_data["short_link"] =  f'{base_url}/{random_md5(long_link, user)}'
-    
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-    
-        request = self.context.get("request")
-        long_link = validated_data["long_link"]
-        validated_data["short_link"] = f"{request.get_host()}/{random_md5(long_link, instance.owner)}"
-        return super().update(instance, validated_data)
-
-    def get_url(self, obj):
-
-        request = self.context.get("request")
-        url = reverse("link-detail", request=request, kwargs={"pk":obj.id})
-        return url
-
-    def get_owner(self, obj):
-        if obj.owner is None:
-            return None
-        return obj.owner.email
-
-    def get_analytic(self, obj):
-        obj_analytic = obj.analyticbydatetime_set
-        
-        analytic = {"date_time_anaylytic":obj_analytic.get_analytic(),
-                     "other_analytic": {"Browser": obj.analytic.browser,
-                                        "OS":obj.analytic.os,
-                                        "Device":obj.analytic.device,
-                                        "Referer":obj.analytic.referer,
-                                        "Country":obj.analytic.country
-                                        }   
-        }
-        return analytic
-
-    def to_internal_value(self, data):
-        long_link = data.get("long_link")
-        print(long_link, "\n", len(long_link))
-        if len(long_link) > 255:
-            raise LinkTooLong({"error":"Link cannot be greater than 255"})
-        return super().to_internal_value(data)

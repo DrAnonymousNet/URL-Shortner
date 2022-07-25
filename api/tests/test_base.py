@@ -16,6 +16,7 @@ class TestBaseView(APITestCase):
         urlpatterns = [
             path("", include("url_shortner.urls"))
         ]
+
         self.client = APIClient()
 
         self.user = User.objects.create_superuser(email="test@gmail.com",
@@ -27,21 +28,15 @@ class TestBaseView(APITestCase):
 
         #Authentication
         JWTToken = self.client.post("/v1/auth/jwt/create", data={"email":"test@gmail.com", "password":"12345"})
-    
         self.access = JWTToken.data["access"]
-        #print(self.access)
         self.client.force_authenticate(user=self.user)
         #self.client.credentials(HTTP_AUTHORIZATION=f"JWT {self.access}")
-
-
-
         
         self.link_1 = Link.objects.create(long_link="https://stackoverflow.com/questions/23467032/how-to-set-up-load-balancing-with-nginx-and-gunicorn", owner=self.user)
         self.link_2 = Link.objects.create(long_link="https://chat.whatsapp.com/I6P6T9T3Oev3v6LJN6Fc7W")
         
         self.link_list_url = "/v1/links/"
         self.link_detail_url = f"/v1/links/{self.link_1.id}"
-
         
         self.factory = APIRequestFactory()
         
