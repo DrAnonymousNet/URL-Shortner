@@ -32,7 +32,7 @@ def update_analytic(request, link, tzinfo):
     
 
 def update_date_time_analytic(request, link, tzinfo):
-    date_time = timezone.localtime(timezone=tzinfo)
+    date_time = datetime.now(tz=tzinfo)
     analytic = link.analyticbydatetime_set
     try:
         curr = analytic.get(date=date_time.date(), time__hour=date_time.time().hour)

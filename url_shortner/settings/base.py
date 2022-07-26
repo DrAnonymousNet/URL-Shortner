@@ -134,7 +134,7 @@ TIME_ZONE = 'UTC'
 #TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 
-#USE_TZ = True
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -169,7 +169,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
    'AUTH_HEADER_TYPES': ('Bearer',),
    'BLACKLIST_AFTER_ROTATION':False

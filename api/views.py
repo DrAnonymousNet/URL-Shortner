@@ -77,6 +77,7 @@ class RedirectView(APIView):
         
         try:
             link = Link.objects.get(short_link=full_short_link)
+            print(link.last_visited_date)
             owner = link.owner
         except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
@@ -84,7 +85,7 @@ class RedirectView(APIView):
         if not is_blacklisted(request) and update_analytic(request, link, tzinfo):
             tzinfo = tz.gettz(owner.timezone)
             link.visit_count = F("visit_count") + 1
-            link.last_visited_date = timezone.localtime(timezone=tzinfo or tz.get("UTC"))
+            link.last_visited_date = datetime.now(tz=tzinfo or tz.get("UTC"))
             link.save()
         long_link = link.long_link
         

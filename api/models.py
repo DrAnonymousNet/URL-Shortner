@@ -6,14 +6,16 @@ from django.db.models import F, Sum ,Q
 from datetime import datetime, timedelta, date, tzinfo
 from decouple import config
 from pytz import timezone
+from requests import request
 from .hash_generator import build_full_url, random_md5
-import dateutil.tz
+from dateutil import tz
 from django.core.validators import URLValidator
 from django.utils import timezone
 
 
-def get_start_and_end_date():
-    today_date = timezone.localdate()
+def get_start_and_end_date(tzinfo):
+
+    today_date = datetime.now(tz=tzinfo)
     start_week = today_date - timedelta(today_date.isoweekday())
     end_week = start_week + timedelta(7)
     return start_week, end_week
@@ -29,19 +31,20 @@ class LinkManager(models.Manager):
     def find_stale(self):
         """This method find all links that has not been active in the last 30 days"""
         #tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
-        return self.annotate(days_of_inactive =timezone.now().date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 30))
+        return self.annotate(days_of_inactive =datetime.now().date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 30))
 
 
 
 class AnalyticDateTimeManager(models.Manager):
     """Manager for Analytics to add custom query to get various analytics"""
-    def get_analytic(self):        
-        startdate, enddate = get_start_and_end_date()
+    def get_analytic(self, link):
+        tzinfo = tz.gettz(link.owner.timezone) if link.owner else tz.gettz("UTC")
+        startdate, enddate = get_start_and_end_date(tzinfo)
         by_date = self.values("date")
-        by_current_month=by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
-        today_total= by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
+        by_current_month=by_date.filter(date__month = datetime.now(tzinfo).date().month).annotate(Sum("count"))
+        today_total= by_date.filter(date__month = datetime.now(tzinfo).date().month).annotate(Sum("count"))
         this_week_by_day =by_date.filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
-        today_by_hour = self.values("time__hour").filter(date = timezone.now().date()).annotate(Sum("count"))
+        today_by_hour = self.values("time__hour").filter(date = datetime.now(tzinfo).date()).annotate(Sum("count"))
         return {
             "current_month":by_current_month,
             "today_total":today_total,
@@ -50,10 +53,9 @@ class AnalyticDateTimeManager(models.Manager):
         }
 
     
-    def get_by_current_month(self):
+    def get_by_current_month(self,link):
         
-
-        return self.values("date").filter(date__month = timezone.now().date().month).annotate(Sum("count"))
+        return self.values("date").filter(date__month = timezone.localtime().date().month).annotate(Sum("count"))
     
     def get_today_total(self):
         return self.values("date").filter(date = timezone.now().date()).annotate(Sum("count"))
@@ -76,7 +78,7 @@ class Link(models.Model):
     long_link = models.TextField(_("Long link"), blank=False, null=False, max_length=1000, validators=[URLValidator])
     last_visited_date = models.DateTimeField(_("last visited"), editable=False,null=True, default=None)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(editable=False)
     objects = LinkManager()
 
     class Meta:
@@ -88,8 +90,10 @@ class Link(models.Model):
     def save(self, **kwargs) -> None:
 
         if self._state.adding:
-            tz = timezone.get_current_timezone()
-            self.date_created = timezone.now()
+            tzinfo = tz.gettz(self.owner.timezone) if self.owner else tz.gettz("UTC")
+            print(tzinfo)
+            self.date_created = datetime.now(tz=tzinfo)
+            print(self.date_created)
         try:
             request = self.request
             HOST_NAME = build_full_url()

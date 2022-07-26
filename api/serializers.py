@@ -1,3 +1,5 @@
+from datetime import datetime, tzinfo
+from pytz import timezone
 from rest_framework.routers import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -6,7 +8,8 @@ from .hash_generator import random_md5,build_full_url
 from django.db import transaction
 from rest_framework.authtoken.models import Token
 from .exceptions import *
-
+from dateutil import tz
+from datetime import datetime
 
 User = get_user_model()
 
@@ -64,7 +67,7 @@ class LinkSerializer(serializers.ModelSerializer):
     def get_analytic(self, obj):
         obj_analytic = obj.analyticbydatetime_set
         
-        analytic = {"date_time_anaylytic":obj_analytic.get_analytic(),
+        analytic = {"date_time_anaylytic":obj_analytic.get_analytic(obj),
                      "other_analytic": {"Browser": obj.analytic.browser,
                                         "OS":obj.analytic.os,
                                         "Device":obj.analytic.device,
@@ -75,11 +78,51 @@ class LinkSerializer(serializers.ModelSerializer):
         return analytic
 
     def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+
         long_link = data.get("long_link")
+        try:
+            tzinfo = User.objects.get(email=data.get("owner")).timezone 
+        except:
+            tzinfo = "UTC"
+        date_created =data.get("date_created")
+        last_visited_date = data.get("last_visited_date")
+        usertzinfo = tz.gettz(tzinfo)
+
+        date_created = change_to_owner_tz(date_created, usertzinfo)
+        last_visited_date = change_to_owner_tz(last_visited_date, usertzinfo)
         print(long_link, "\n", len(long_link))
-        if len(long_link) > 255:
-            raise LinkTooLong({"error":"Link cannot be greater than 255"})
-        return super().to_internal_value(data)
+        #if len(long_link) > 255:
+        #    raise LinkTooLong({"error":"Link cannot be greater than 255"})
+
+        return data
+
+    def to_representation(self, instance):
+        instance = super().to_representation(instance)
+        try:
+            tzinfo = User.objects.get(email=instance.get("owner")).timezone 
+        except:
+            tzinfo = "UTC"
+        usertzinfo = tz.gettz(tzinfo)
+        date_created =instance.get("date_created")
+        last_visited_date = instance.get("last_visited_date")
+        date_created = change_to_owner_tz(date_created, usertzinfo)
+        print(last_visited_date)
+        last_visited_date = change_to_owner_tz(last_visited_date, usertzinfo)
+        instance["date_created"] = str(date_created)
+        instance["last_visited_date"] = last_visited_date if last_visited_date == None else str(last_visited_date)
+        return instance
+
+def change_to_owner_tz(date, tz):
+    if date == "None" or date == None:
+        return date
+    try:
+        create_date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f%z")
+    except:
+        create_date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S%z")
+
+    date_with_tz = create_date.astimezone(tz=tz)
+    return date_with_tz
 
 
 
