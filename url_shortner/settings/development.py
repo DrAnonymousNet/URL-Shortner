@@ -14,10 +14,10 @@ DATABASES = {
   'default': {
     'ENGINE': 'django_psdb_engine',
     'NAME': config('DB_NAME'),
-    'HOST': config('RE_HOST'),
+    'HOST': config('DB_HOST'),
     'PORT': config('DB_PORT'),
-    'USER': config('RE_USER'),
-    'PASSWORD': config('RE_PASSWORD'),
+    'USER': config('DB_USER'),
+    'PASSWORD': config('DB_PASSWORD'),
     'OPTIONS': {'ssl': False}
   }
 }
