@@ -93,7 +93,9 @@ class Link(models.Model):
     def save(self, **kwargs) -> None:
 
         if self._state.adding:
-            self.date_created = timezone.now()
+            tz = timezone.get_current_timezone()
+            timezone.activate(tz)
+            self.date_created = timezone.localtime(timezone=tz)
             print(self.date_created.tzinfo, "hh")
             print(self.date_created)
         if self.last_visited_date:
