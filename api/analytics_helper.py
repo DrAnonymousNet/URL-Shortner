@@ -4,6 +4,8 @@ from django_user_agents.utils import get_user_agent
 from datetime import datetime, timedelta
 from django.db import transaction, models
 from typing import List
+
+from django.utils import timezone
 from url_shortner.celery import app
 
 
@@ -30,7 +32,7 @@ def update_analytic(request, link):
     
 
 def update_date_time_analytic(request, link):
-    date_time = datetime.now()
+    date_time = timezone.now()
     analytic = link.analyticbydatetime_set
     try:
         curr = analytic.get(date=date_time.date(), time__hour=date_time.time().hour)

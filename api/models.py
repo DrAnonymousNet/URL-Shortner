@@ -4,9 +4,11 @@ from django.contrib.auth import get_user_model
 from django.db.models import F, Sum ,Q
 from datetime import datetime, timedelta, date
 from decouple import config
+from pytz import timezone
 from .hash_generator import build_full_url, random_md5
 import dateutil.tz
 from django.core.validators import URLValidator
+from django.utils import timezone
 
 
 def get_start_and_end_date():
@@ -25,8 +27,8 @@ class LinkManager(models.Manager):
 
     def find_stale(self):
         """This method find all links that has not been active in the last 30 days"""
-        tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
-        return self.annotate(days_of_inactive =datetime.now(tz=tzinfo).date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 30))
+        #tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
+        return self.annotate(days_of_inactive =timezone.now().date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 30))
 
 
 
@@ -36,10 +38,10 @@ class AnalyticDateTimeManager(models.Manager):
         startdate, enddate = get_start_and_end_date()
         by_date = self.values("date")
 
-        by_current_month=by_date.filter(date__month = datetime.now().date().month).annotate(Sum("count"))
-        today_total= by_date.filter(date__month = datetime.now().date().month).annotate(Sum("count"))
+        by_current_month=by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
+        today_total= by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
         this_week_by_day =by_date.filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
-        today_by_hour = self.values("time__hour").filter(date = datetime.now().date()).annotate(Sum("count"))
+        today_by_hour = self.values("time__hour").filter(date = timezone.now().date()).annotate(Sum("count"))
         return {
             "current_month":by_current_month,
             "today_total":today_total,
@@ -49,14 +51,14 @@ class AnalyticDateTimeManager(models.Manager):
 
     
     def get_by_current_month(self):
-        return self.values("date").filter(date__month = datetime.now().date().month).annotate(Sum("count"))
+        return self.values("date").filter(date__month = timezone.now().date().month).annotate(Sum("count"))
     
     def get_today_total(self):
-        return self.values("date").filter(date = datetime.now().date()).annotate(Sum("count"))
+        return self.values("date").filter(date = timezone.now().date()).annotate(Sum("count"))
     
     
     def get_today_by_hour(self):
-        return self.values("time__hour").filter(date = datetime.now().date()).annotate(Sum("count"))
+        return self.values("time__hour").filter(date = timezone.now().date()).annotate(Sum("count"))
     
     
     def get_this_week_by_day(self):
