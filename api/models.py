@@ -73,9 +73,9 @@ class Link(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, db_constraint=False)
     short_link = models.URLField(_("Short link"), editable=False)
     long_link = models.TextField(_("Long link"), blank=False, null=False, max_length=1000, validators=[URLValidator])
-    last_visited_date = models.DateField(_("last visited"), editable=False,null=True, default=None)
+    last_visited_date = models.DateTimeField(_("last visited"), editable=False,null=True, default=None)
     visit_count = models.PositiveBigIntegerField(_("visit count"),editable=False, default=0)
-    date_created = models.DateField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     objects = LinkManager()
 
     class Meta:
@@ -85,9 +85,10 @@ class Link(models.Model):
         ]
 
     def save(self, **kwargs) -> None:
+
         if self._state.adding:
-            self.date_created = timezone.localtime(self.date_created).date()
-            print(self.date_created)
+            self.date_created = timezone.localtime()
+            print(self.date_created.tzinfo)
         if self.last_visited_date:
             tz = self.date_created.tzinfo
             self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date()
@@ -98,7 +99,7 @@ class Link(models.Model):
             HOST_NAME = f'http://{config("HOST_NAME")}'
         if not self.short_link:
             self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)}"
-        return super().save(**kwargs)
+        instance = super().save(**kwargs)
 
 
     def __str__(self) -> str:
