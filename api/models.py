@@ -51,7 +51,7 @@ class AnalyticDateTimeManager(models.Manager):
 
     
     def get_by_current_month(self):
-        
+
         return self.values("date").filter(date__month = timezone.now().date().month).annotate(Sum("count"))
     
     def get_today_total(self):
@@ -85,11 +85,12 @@ class Link(models.Model):
         ]
 
     def save(self, **kwargs) -> None:
-        if kwargs["created"]:
-            self.date_created = timezone.localtime(self.date_created).date
+        if self._state.adding:
+            self.date_created = timezone.localtime(self.date_created).date()
+            print(self.date_created)
         if self.last_visited_date:
             tz = self.date_created.tzinfo
-            self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date
+            self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date()
         try:
             request = self.request
             HOST_NAME = build_full_url()
