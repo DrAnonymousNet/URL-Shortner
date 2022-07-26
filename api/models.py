@@ -1,8 +1,9 @@
+from email.utils import localtime
 from django.db import models
 from django.utils .translation import gettext as _
 from django.contrib.auth import get_user_model
 from django.db.models import F, Sum ,Q
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, tzinfo
 from decouple import config
 from pytz import timezone
 from .hash_generator import build_full_url, random_md5
@@ -35,8 +36,12 @@ class LinkManager(models.Manager):
 class AnalyticDateTimeManager(models.Manager):
     """Manager for Analytics to add custom query to get various analytics"""
     def get_analytic(self):
+        #tz = self.link.date_created.tzinfo
+        tz = localtime().tzinfo
+        print(self, "This")
         startdate, enddate = get_start_and_end_date()
         by_date = self.values("date")
+        print(by_date)
 
         by_current_month=by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
         today_total= by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
@@ -51,6 +56,7 @@ class AnalyticDateTimeManager(models.Manager):
 
     
     def get_by_current_month(self):
+        
 
         return self.values("date").filter(date__month = timezone.now().date().month).annotate(Sum("count"))
     
@@ -89,8 +95,11 @@ class Link(models.Model):
         if self._state.adding:
             self.date_created = timezone.localtime()
             print(self.date_created.tzinfo)
+            print(self.last_visited_date)
         if self.last_visited_date:
             tz = self.date_created.tzinfo
+            print(self.last_visited_date)
+            print(tz)
             self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date()
         try:
             request = self.request
