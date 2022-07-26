@@ -94,7 +94,7 @@ class Link(models.Model):
 
         if self._state.adding:
             self.date_created = timezone.localtime()
-            print(self.date_created.tzinfo)
+            print(self.date_created.tzinfo, "hh")
             print(self.last_visited_date)
         if self.last_visited_date:
             tz = self.date_created.tzinfo
