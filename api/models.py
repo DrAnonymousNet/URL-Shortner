@@ -95,11 +95,13 @@ class Link(models.Model):
         if self._state.adding:
             tz = timezone.get_current_timezone()
             timezone.activate(tz)
+
             self.date_created = timezone.localtime(timezone=tz)
             print(self.date_created.tzinfo, "hh")
             print(self.date_created)
         if self.last_visited_date:
-            tz = self.date_created.tzinfo
+            tz = timezone.get_current_timezone()
+            timezone.activate(tz)
             print(self.last_visited_date)
             print(tz)
             self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date()
