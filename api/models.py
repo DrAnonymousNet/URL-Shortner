@@ -38,10 +38,10 @@ class AnalyticDateTimeManager(models.Manager):
     def get_analytic(self):
         #tz = self.link.date_created.tzinfo
         tz = localtime().tzinfo
-        print(self, "This")
+        
         startdate, enddate = get_start_and_end_date()
         by_date = self.values("date")
-        print(by_date)
+        
 
         by_current_month=by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
         today_total= by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
