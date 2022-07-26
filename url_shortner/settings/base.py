@@ -130,11 +130,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-#TIME_ZONE = 'UTC'
-TIME_ZONE = "Africa/Lagos"
+TIME_ZONE = 'UTC'
+#TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 
-USE_TZ = True
+#USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -190,7 +190,8 @@ DJOSER = {
     "SEND_ACTIVATION_EMAIL":True,
     'EMAIL':{
         "activation":"api.email_helper.ActivationEmail"
-    }
+    },
+ 
    
 }
 SWAGGER_SETTINGS = {
@@ -208,7 +209,7 @@ SWAGGER_SETTINGS = {
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "haryournifemijt@gmail.com"
+EMAIL_HOST_USER = config("EMAIL")
 EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 

@@ -14,7 +14,7 @@ logger = logging.getLogger("testlogger")
 FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "Twitterbot", "TelegramBot"]
 
 @app.task(name="analytic")
-def update_analytic(request, link):
+def update_analytic(request, link, tzinfo):
     analytic = link.analytic
     with transaction.atomic():
         user_agent = get_user_agent(request)
@@ -23,7 +23,7 @@ def update_analytic(request, link):
 
         if not_is_robot and ip_not_crawler:
             update_referer_analyic(request, analytic)
-            update_date_time_analytic(request, link)
+            update_date_time_analytic(request, link, tzinfo)
             analytic.save()
             link.save()
         else:
@@ -31,9 +31,8 @@ def update_analytic(request, link):
     return True
     
 
-def update_date_time_analytic(request, link):
-    tz = link.date_created.tzinfo
-    date_time = timezone.localtime(timezone=tz)
+def update_date_time_analytic(request, link, tzinfo):
+    date_time = timezone.localtime(timezone=tzinfo)
     analytic = link.analyticbydatetime_set
     try:
         curr = analytic.get(date=date_time.date(), time__hour=date_time.time().hour)

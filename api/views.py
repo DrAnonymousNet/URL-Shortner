@@ -16,6 +16,7 @@ from .permissions import isOwner
 from django.utils import timezone
 import logging
 from .analytics_helper import is_blacklisted
+from dateutil import tz
 
 
 logger = logging.getLogger("testlogger")
@@ -75,13 +76,15 @@ class RedirectView(APIView):
         full_short_link = f"{build_full_url(request)}/{short_link}"
         
         try:
-            user = request.user if request.user.is_authenticated else None
             link = Link.objects.get(short_link=full_short_link)
+            owner = link.owner
         except:
             return Response({"error":"The link cannot be found"}, status=status.HTTP_404_NOT_FOUND)
-        if not is_blacklisted(request) and update_analytic(request, link):
+        tzinfo = tz.gettz(owner.timezone)
+        if not is_blacklisted(request) and update_analytic(request, link, tzinfo):
+            tzinfo = tz.gettz(owner.timezone)
             link.visit_count = F("visit_count") + 1
-            link.last_visited_date = timezone.now()
+            link.last_visited_date = timezone.localtime(timezone=tzinfo or tz.get("UTC"))
             link.save()
         long_link = link.long_link
         

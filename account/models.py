@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
-
+import pytz
 # Create your models here.
 
 
@@ -87,6 +87,9 @@ class UserManager(BaseUserManager):
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
+
+    TIMEZONE = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -94,12 +97,13 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     )
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100)
+    timezone = models.CharField(max_length=50, default="UTC", choices=TIMEZONE)
     is_active = models.BooleanField(default=True)
     staff = models.BooleanField(default=False) # a admin user; non super-user
     admin = models.BooleanField(default=False) # a superuser
     objects = UserManager()
 
-
+    REQUIRED_FIELDS = ["timezone"]
     USERNAME_FIELD = 'email'
 
     def _get_full_name(self):

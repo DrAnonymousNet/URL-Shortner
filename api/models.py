@@ -35,18 +35,13 @@ class LinkManager(models.Manager):
 
 class AnalyticDateTimeManager(models.Manager):
     """Manager for Analytics to add custom query to get various analytics"""
-    def get_analytic(self):
-        #tz = self.link.date_created.tzinfo
-        tz = localtime().tzinfo
-        
+    def get_analytic(self):        
         startdate, enddate = get_start_and_end_date()
         by_date = self.values("date")
-        
-
-        by_current_month=by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
-        today_total= by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
+        by_current_month=by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
+        today_total= by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
         this_week_by_day =by_date.filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
-        today_by_hour = self.values("time__hour").filter(date = timezone.localtime().date()).annotate(Sum("count"))
+        today_by_hour = self.values("time__hour").filter(date = timezone.now().date()).annotate(Sum("count"))
         return {
             "current_month":by_current_month,
             "today_total":today_total,
@@ -94,17 +89,7 @@ class Link(models.Model):
 
         if self._state.adding:
             tz = timezone.get_current_timezone()
-            timezone.activate(tz)
-
-            self.date_created = timezone.localtime(timezone=tz)
-            print(self.date_created.tzinfo, "hh")
-            print(self.date_created)
-        if self.last_visited_date:
-            tz = timezone.get_current_timezone()
-            timezone.activate(tz)
-            print(self.last_visited_date)
-            print(tz)
-            self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date()
+            self.date_created = timezone.now()
         try:
             request = self.request
             HOST_NAME = build_full_url()
@@ -112,7 +97,7 @@ class Link(models.Model):
             HOST_NAME = f'http://{config("HOST_NAME")}'
         if not self.short_link:
             self.short_link = f"{HOST_NAME}/{random_md5(self.long_link)}"
-        instance = super().save(**kwargs)
+        return super().save(**kwargs)
 
 
     def __str__(self) -> str:
