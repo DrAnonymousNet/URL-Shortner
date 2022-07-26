@@ -12,7 +12,7 @@ from django.utils import timezone
 
 
 def get_start_and_end_date():
-    today_date = date.today()
+    today_date = timezone.localdate()
     start_week = today_date - timedelta(today_date.isoweekday())
     end_week = start_week + timedelta(7)
     return start_week, end_week
@@ -38,10 +38,10 @@ class AnalyticDateTimeManager(models.Manager):
         startdate, enddate = get_start_and_end_date()
         by_date = self.values("date")
 
-        by_current_month=by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
-        today_total= by_date.filter(date__month = timezone.now().date().month).annotate(Sum("count"))
+        by_current_month=by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
+        today_total= by_date.filter(date__month = timezone.localdate().month).annotate(Sum("count"))
         this_week_by_day =by_date.filter(Q(date__gte = startdate), Q(date__lt=enddate)).annotate(Sum("count"))
-        today_by_hour = self.values("time__hour").filter(date = timezone.now().date()).annotate(Sum("count"))
+        today_by_hour = self.values("time__hour").filter(date = timezone.localtime().date()).annotate(Sum("count"))
         return {
             "current_month":by_current_month,
             "today_total":today_total,
@@ -51,6 +51,7 @@ class AnalyticDateTimeManager(models.Manager):
 
     
     def get_by_current_month(self):
+        
         return self.values("date").filter(date__month = timezone.now().date().month).annotate(Sum("count"))
     
     def get_today_total(self):
@@ -84,6 +85,11 @@ class Link(models.Model):
         ]
 
     def save(self, **kwargs) -> None:
+        if kwargs["created"]:
+            self.date_created = timezone.localtime(self.date_created).date
+        if self.last_visited_date:
+            tz = self.date_created.tzinfo
+            self.last_visited_date = timezone.localtime(self.last_visited_date, timezone = tz).date
         try:
             request = self.request
             HOST_NAME = build_full_url()

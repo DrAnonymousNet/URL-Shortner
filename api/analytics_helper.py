@@ -1,7 +1,7 @@
 import logging
 from django.contrib.gis.geoip2 import GeoIP2
 from django_user_agents.utils import get_user_agent
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
 from django.db import transaction, models
 from typing import List
 
@@ -32,7 +32,8 @@ def update_analytic(request, link):
     
 
 def update_date_time_analytic(request, link):
-    date_time = timezone.now()
+    tz = link.date_created.tzinfo
+    date_time = timezone.localtime(tzinfo=tz)
     analytic = link.analyticbydatetime_set
     try:
         curr = analytic.get(date=date_time.date(), time__hour=date_time.time().hour)

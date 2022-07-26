@@ -10,6 +10,8 @@ from .exceptions import *
 
 User = get_user_model()
 
+
+
 class LinkSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
