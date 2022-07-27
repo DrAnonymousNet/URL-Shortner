@@ -23,6 +23,9 @@
   
   11. Make migrations: <br> ```$ python manage.py migrate```
   12. Run the development server: <br> ```$ python manage.py runserver```
+
+
+For [Hashnode](https://hashnode.com) X [Planetscale](https://planetscale.com)
   
   
   
