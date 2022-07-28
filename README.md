@@ -8,7 +8,7 @@
  
   1. Create a directory in your local machine (Name of your choice):  <br> ```$ mkdir Shortner```
 
-  2. Change present working directory into `Office`: <br> ```$ cd Shortner```
+  2. Change present working directory into `Shortner`: <br> ```$ cd Shortner```
 
   3. Create a Virtual Environment: <br> ```$ python3 -m venv venv```
 
