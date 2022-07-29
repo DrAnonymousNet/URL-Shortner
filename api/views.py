@@ -9,7 +9,7 @@ from rest_framework.routers import reverse
 from rest_framework import viewsets, permissions
 
 from .filters import LinkFilter
-from .models import Link
+from .models import Link, TotalRedirection
 from .serializers import *
 from rest_framework import status, generics
 from rest_framework.views import APIView
@@ -92,9 +92,12 @@ class RedirectView(APIView):
             tzinfo = tz.gettz("UTC")
 
         if not is_blacklisted(request) and update_analytic(request, link, tzinfo):
+            totalredirection = TotalRedirection.objects.first()
+            totalredirection.total = F("total") + 1
             link.visit_count = F("visit_count") + 1
             link.last_visited_date = datetime.now(tz=tzinfo or tz.get("UTC"))
             link.save()
+            totalredirection.save()
         long_link = link.long_link
         
         return redirect(long_link)

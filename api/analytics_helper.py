@@ -25,7 +25,7 @@ def update_analytic(request, link, tzinfo):
             update_referer_analyic(request, analytic)
             update_date_time_analytic(request, link, tzinfo)
             analytic.save()
-            link.save()
+            #link.save()
         else:
             return False
     return True
