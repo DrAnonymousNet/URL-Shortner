@@ -9,6 +9,8 @@ from url_shortner.celery import app
 def clean_stale():
     stale = Link.objects.find_stale()
     stale.delete()
+    other_stale = Link.objects.find_unvisited()
+    other_stale.dalete()
 
 
 #celery -A url_shortner beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
