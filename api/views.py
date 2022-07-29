@@ -1,6 +1,10 @@
-from urllib import request, response
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers, vary_on_cookie
+
+
 from django.http import Http404, HttpRequest
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from rest_framework.routers import reverse
 from rest_framework import viewsets, permissions
 
@@ -13,7 +17,6 @@ from rest_framework.response import Response
 from django.db.models import F
 from .analytics_helper import *
 from .permissions import isOwner
-from django.utils import timezone
 import logging
 from .analytics_helper import is_blacklisted
 from dateutil import tz
@@ -34,6 +37,8 @@ class LinkViewSet(viewsets.ModelViewSet):
     queryset = Link.objects.all().select_related("analytic","owner").prefetch_related("analyticbydatetime_set")
     http_method_names = ["get", "post", "delete", "patch"]
 
+    @method_decorator(cache_page(15*60))
+    @method_decorator(vary_on_headers("Authorization"))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
