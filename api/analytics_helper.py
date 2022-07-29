@@ -65,6 +65,7 @@ def update_referer_analyic(request, analytic):
     user_agent = get_user_agent(request)
     browser = get_browser(user_agent)
     if browser.lower() == "whatsapp" and not _referer:
+        
         _referer = "WhatsApp"
     if _referer:
         referer_count = analytic.referer.setdefault(_referer, 0)
