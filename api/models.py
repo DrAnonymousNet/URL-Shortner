@@ -31,7 +31,7 @@ class LinkManager(models.Manager):
     def find_stale(self):
         """This method find all links that has not been active in the last 30 days"""
         #tzinfo=dateutil.tz.tzoffset(None, 3*60*60)
-        return self.annotate(days_of_inactive =datetime.now().date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 10))
+        return self.annotate(days_of_inactive =datetime.now().date() -  F("last_visited_date") ).filter(days_of_inactive__gte = timedelta(days = 1))
 
 
 
