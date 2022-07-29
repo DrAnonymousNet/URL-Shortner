@@ -149,4 +149,8 @@ class AnalyticByDateTime(models.Model):
             models.Index(fields=["link"])
         ]
 
+class TotalRedirection(models.Model):
+    total = models.BigIntegerField()
 
+    def __str__(self):
+        return f"Total {self.total}"
