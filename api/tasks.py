@@ -5,7 +5,7 @@ from .models import Link
 from url_shortner.celery import app
 
 
-@shared_task
+@app.task
 def clean_stale():
     stale = Link.objects.find_stale()
     stale.delete()
