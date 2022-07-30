@@ -37,16 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     #intalled APP
     'account',
     'api',
-    "corsheaders",
-    
-
 
     # install package
     'rest_framework',
     "silk",
+    "corsheaders",
     'django_filters',
      'django_user_agents',
      'rest_framework_simplejwt',
@@ -55,6 +54,7 @@ INSTALLED_APPS = [
      'django_extensions',
      'django_celery_beat'
 ]
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     #'api.middleware.SqlPrintingMiddleware',
