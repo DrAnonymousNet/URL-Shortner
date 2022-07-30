@@ -37,8 +37,7 @@ class LinkViewSet(viewsets.ModelViewSet):
     queryset = Link.objects.all().select_related("analytic","owner").prefetch_related("analyticbydatetime_set")
     http_method_names = ["get", "post", "delete", "patch"]
 
-    @method_decorator(cache_page(15*60))
-    @method_decorator(vary_on_headers("Authorization"))
+    
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
