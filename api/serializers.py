@@ -1,5 +1,6 @@
 from datetime import datetime, tzinfo
-from pytz import timezone
+from time import time
+from django.utils import timezone
 from rest_framework.routers import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -104,6 +105,7 @@ class LinkSerializer(serializers.ModelSerializer):
         except:
             tzinfo = "UTC"
         usertzinfo = tz.gettz(tzinfo)
+        user_current_month = timezone.localtime(timezone=usertzinfo).month
         date_created =instance.get("date_created")
         last_visited_date = instance.get("last_visited_date")
         date_created = change_to_owner_tz(date_created, usertzinfo)
@@ -111,6 +113,8 @@ class LinkSerializer(serializers.ModelSerializer):
         last_visited_date = change_to_owner_tz(last_visited_date, usertzinfo)
         instance["date_created"] = str(date_created)
         instance["last_visited_date"] = last_visited_date if last_visited_date == None else str(last_visited_date)
+        instance["user_current_month"] = str(user_current_month)
+        instance["user_time_zone"] = str(tzinfo)
         return instance
 
 def change_to_owner_tz(date, tz):
