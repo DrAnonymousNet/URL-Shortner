@@ -106,7 +106,7 @@ class LinkSerializer(serializers.ModelSerializer):
             tzinfo = "UTC"
         usertzinfo = tz.gettz(tzinfo)
         user_current_month = timezone.localtime(timezone=usertzinfo).month
-        user_current_day = timezone.localtime(timezone=usertzinfo).day
+        user_current_date = timezone.localtime(timezone=usertzinfo).date()
         date_created =instance.get("date_created")
         last_visited_date = instance.get("last_visited_date")
         date_created = change_to_owner_tz(date_created, usertzinfo)
@@ -116,7 +116,7 @@ class LinkSerializer(serializers.ModelSerializer):
         instance["last_visited_date"] = last_visited_date if last_visited_date == None else str(last_visited_date)
         instance["user_current_month"] = str(user_current_month)
         instance["user_time_zone"] = str(tzinfo)
-        instance["user_current_day"] = str(user_current_day)
+        instance["user_current_date"] = str(user_current_date)
         return instance
 
 def change_to_owner_tz(date, tz):
