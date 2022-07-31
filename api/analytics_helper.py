@@ -1,11 +1,13 @@
 import logging
 from django.contrib.gis.geoip2 import GeoIP2
+from django.http import HttpRequest
 from django_user_agents.utils import get_user_agent
 from datetime import datetime, timedelta, tzinfo
 from django.db import transaction, models
-from typing import List
+from typing import List, Tuple
 
 from django.utils import timezone
+from .models import Analytic, Link
 from url_shortner.celery import app
 
 
@@ -14,7 +16,7 @@ logger = logging.getLogger("testlogger")
 FLAGGED_AGENT = ["FacebookBot", "LinkedlnBot","Go-http-client", "Twitterbot", "TelegramBot"]
 
 @app.task(name="analytic")
-def update_analytic(request, link, tzinfo):
+def update_analytic(request:HttpRequest, link:Link, tzinfo:tzinfo) -> bool:
     analytic = link.analytic
     with transaction.atomic():
         user_agent = get_user_agent(request)
@@ -31,7 +33,7 @@ def update_analytic(request, link, tzinfo):
     return True
     
 
-def update_date_time_analytic(request, link, tzinfo):
+def update_date_time_analytic(request, link:Link, tzinfo:tzinfo) -> None:
     date_time = datetime.now(tz=tzinfo)
     analytic = link.analyticbydatetime_set
     try:
@@ -44,32 +46,32 @@ def update_date_time_analytic(request, link, tzinfo):
     return
 
 
-def update_device_analytic(user_agent, analytic)-> bool:    
-    _browser:str = get_browser(user_agent)
-    if _browser in FLAGGED_AGENT or "bot" in _browser.lower():
+def update_device_analytic(user_agent, analytic:Analytic)-> bool:    
+    browser:str = get_browser(user_agent)
+    if browser in FLAGGED_AGENT or "bot" in browser.lower():
         return False
     #logger.info(_browser)
-    _device = user_agent.get_device().split(" ")[0]
-    _os = user_agent.get_os().split(" ")[0]
-    device_count = analytic.device.setdefault(_device ,0)
-    analytic.device.update({_device:device_count+1})
-    browser_count = analytic.browser.setdefault(_browser, 0)
-    analytic.browser.update({_browser:browser_count+1})
-    os_count = analytic.os.setdefault(_os, 0)
-    analytic.os.update({_os:os_count+1})
+    device = user_agent.get_device().split(" ")[0]
+    os = user_agent.get_os().split(" ")[0]
+    device_count = analytic.device.setdefault(device ,0)
+    analytic.device.update({device:device_count+1})
+    browser_count = analytic.browser.setdefault(browser, 0)
+    analytic.browser.update({browser:browser_count+1})
+    os_count = analytic.os.setdefault(os, 0)
+    analytic.os.update({os:os_count+1})
     return True
   
 
-def update_referer_analyic(request, analytic):
-    _referer = request.META.get("HTTP_REFERER")
+def update_referer_analyic(request, analytic) -> None:
+    referer = request.META.get("HTTP_REFERER")
     user_agent = get_user_agent(request)
     browser = get_browser(user_agent)
-    if browser.lower() == "whatsapp" and not _referer:
+    if browser.lower() == "whatsapp" and not referer:
         
-        _referer = "WhatsApp"
-    if _referer:
-        referer_count = analytic.referer.setdefault(_referer, 0)
-        analytic.referer.update({_referer:referer_count+1})
+        referer = "WhatsApp"
+    if referer:
+        referer_count = analytic.referer.setdefault(referer, 0)
+        analytic.referer.update({referer:referer_count+1})
 
 
 def update_country_analytic(request,analytic)->bool:
@@ -104,23 +106,23 @@ def GetCountryData(request)-> str:
 
 
         
-def get_start_and_end_date():
+def get_start_and_end_date() -> Tuple:
     date = datetime.date.today()
     start_week = date - timedelta(date.weekday())
     end_week = start_week + timedelta(7)
     return start_week, end_week
 
-def is_blacklisted(request):
+def is_blacklisted(request) -> bool:
     RAW_URI = request.META.get("RAW_URI", "none")
     if "robot" in RAW_URI.lower():
         return True
     return False
 
-def get_browser(user_agent):
-    _browser:str = user_agent.get_browser().split(" ")
-    if len(_browser) > 2 and isinstance(_browser, List):
-        _browser = " ".join(_browser[:2])
+def get_browser(user_agent) -> str:
+    browser:str = user_agent.get_browser().split(" ")
+    if len(browser) > 2 and isinstance(browser, List):
+        browser = " ".join(browser[:2])
     else:
-        _browser = _browser[0]
+        browser = browser[0]
 
-    return _browser
+    return browser

@@ -119,7 +119,7 @@ class LinkSerializer(serializers.ModelSerializer):
         instance["user_current_date"] = str(user_current_date)
         return instance
 
-def change_to_owner_tz(date, tz):
+def change_to_owner_tz(date:str, tz:tzinfo):
     if date == "None" or date == None:
         return date
     try:

@@ -1,5 +1,6 @@
-from email.utils import localtime
+from typing import Dict
 from django.db import models
+from django.http import QueryDict
 from django.utils .translation import gettext as _
 from django.contrib.auth import get_user_model
 from django.db.models import F, Sum ,Q
@@ -40,7 +41,7 @@ class LinkManager(models.Manager):
 
 class AnalyticDateTimeManager(models.Manager):
     """Manager for Analytics to add custom query to get various analytics"""
-    def get_analytic(self, link):
+    def get_analytic(self, link) -> Dict:
         tzinfo = tz.gettz(link.owner.timezone) if link.owner else tz.gettz("UTC")
         startdate, enddate = get_start_and_end_date(tzinfo)
         by_date = self.values("date")
@@ -148,6 +149,7 @@ class AnalyticByDateTime(models.Model):
             models.Index(fields=["link","date"]),
             models.Index(fields=["link"])
         ]
+
 
 class TotalRedirection(models.Model):
     total = models.BigIntegerField()
