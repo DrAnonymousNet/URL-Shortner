@@ -19,7 +19,8 @@ DATABASES = {
     'PORT': config('DB_PORT'),
     'USER': config('RE_USER'),
     'PASSWORD': config('RE_PASSWORD'),
-    'OPTIONS': {'ssl': False}
+    'OPTIONS': {'ssl': {'ca': os.environ.get('MYSQL_ATTR_SSL_CA')}},
+    #'OPTIONS': {'ssl': False}
   }
 }
 

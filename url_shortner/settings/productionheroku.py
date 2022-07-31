@@ -11,7 +11,7 @@ DATABASES = {
     'PORT': config('DB_PORT'),
     'USER': config('DB_USER'),
     'PASSWORD': config('DB_PASSWORD'),
-    'OPTIONS': {'ssl': False}
+    'OPTIONS': {'ssl': {'ca': os.environ.get('MYSQL_ATTR_SSL_CA')}}
   }
 }
 
