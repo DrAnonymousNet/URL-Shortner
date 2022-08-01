@@ -9,6 +9,9 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+from corsheaders.defaults import default_headers
+from datetime import timedelta
+import os
 from corsheaders.middleware import *
 from pathlib import Path
 from decouple import config
@@ -38,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #intalled APP
+    # intalled APP
     'account',
     'api',
 
@@ -47,17 +50,17 @@ INSTALLED_APPS = [
     "silk",
     "corsheaders",
     'django_filters',
-     'django_user_agents',
-     'rest_framework_simplejwt',
-     'djoser',
-     'drf_yasg',
-     'django_extensions',
-     'django_celery_beat'
+    'django_user_agents',
+    'rest_framework_simplejwt',
+    'djoser',
+    'drf_yasg',
+    'django_extensions',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    #'api.middleware.SqlPrintingMiddleware',
+    # 'api.middleware.SqlPrintingMiddleware',
     'silk.middleware.SilkyMiddleware',
     "api.middleware.ExposeModelRequestMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -69,15 +72,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     'django_user_agents.middleware.UserAgentMiddleware',
-     #'account.middleware.GetCurrentUserMiddleware',
-    
+    'django_user_agents.middleware.UserAgentMiddleware',
+    # 'account.middleware.GetCurrentUserMiddleware',
+
 ]
 
-import os
 
 ROOT_URLCONF = 'url_shortner.urls'
-GEOIP_PATH =os.path.join(BASE_DIR, 'geoip')
+GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 print(BASE_DIR)
 
 
@@ -102,8 +104,6 @@ WSGI_APPLICATION = 'url_shortner.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-
 
 
 # Password validation
@@ -141,17 +141,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR/"staticfiles"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS':"rest_framework.pagination.LimitOffsetPagination"
-    ,
-    "PAGE_SIZE":100,
-     
+    'DEFAULT_PAGINATION_CLASS': "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
+
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
@@ -166,33 +165,32 @@ REST_FRAMEWORK = {
 
 }
 
-from datetime import timedelta
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-   'AUTH_HEADER_TYPES': ('Bearer',),
-   'BLACKLIST_AFTER_ROTATION':False
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'BLACKLIST_AFTER_ROTATION': False
 }
 
 AUTH_USER_MODEL = "account.UserAccount"
 
 DJOSER = {
-    'TOKEN_MODEL':None,
-    "LOGIN_FIELD":"email",
-    "SEND_CONFIRMATION_EMAIL":False,
-    "USER_CREATE_PASSWORD_RETYPE":True,
-    "PASSWORD_RESET_RETYPE":True,
-    "USERNAME_RESET_CONFIRM_URL":"email/reset/{uid}/{token}",
-    "USERNAME_RESET_CONFIRM_URL":"email/reset/{uid}/{token}",
-    "PASSWORD_RESET_CONFIRM_URL":"password/reset/{uid}/{token}",
-    "ACTIVATION_URL":"activate/{uid}/{token}",
-    "SEND_ACTIVATION_EMAIL":True,
-    'EMAIL':{
-        "activation":"api.email_helper.ActivationEmail"
+    'TOKEN_MODEL': None,
+    "LOGIN_FIELD": "email",
+    "SEND_CONFIRMATION_EMAIL": False,
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_RETYPE": True,
+    "USERNAME_RESET_CONFIRM_URL": "email/reset/{uid}/{token}",
+    "USERNAME_RESET_CONFIRM_URL": "email/reset/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    'EMAIL': {
+        "activation": "api.email_helper.ActivationEmail"
     },
- 
-   
+
+
 }
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -247,13 +245,13 @@ LOGGING = {
     }
 }
 
-from corsheaders.defaults import default_headers
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS =True
+CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
-    "https://shortenr.vercel.app","http://localhost:3000","http://127.0.0.1:3000"
-]
+    "https://shortenr.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"]
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "accept",
     "accept-encoding",
@@ -277,10 +275,7 @@ CORS_ALLOW_METHODS = [
 ]
 
 
-
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Lagos'
-
-

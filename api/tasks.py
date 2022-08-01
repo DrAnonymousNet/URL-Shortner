@@ -13,5 +13,5 @@ def clean_stale():
     other_stale.dalete()
 
 
-#celery -A url_shortner beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    
+# celery -A url_shortner beat -l info --scheduler
+# django_celery_beat.schedulers:DatabaseScheduler

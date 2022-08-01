@@ -18,16 +18,18 @@ def terminal_width():
     """
     width = 0
     try:
-        import struct, fcntl, termios
+        import struct
+        import fcntl
+        import termios
         s = struct.pack('HHHH', 0, 0, 0, 0)
         x = fcntl.ioctl(1, termios.TIOCGWINSZ, s)
         width = struct.unpack('HHHH', x)[1]
-    except:
+    except BaseException:
         pass
     if width <= 0:
         try:
             width = int(os.environ['COLUMNS'])
-        except:
+        except BaseException:
             pass
     if width <= 0:
         width = 80
@@ -39,7 +41,9 @@ def SqlPrintingMiddleware(get_response):
     def middleware(request):
         response = get_response(request)
         indentation = 2
-        print("\n\n%s\033[1;35m[SQL Queries for]\033[1;34m %s\033[0m\n" % (" " * indentation, request.path_info))
+        print(
+            "\n\n%s\033[1;35m[SQL Queries for]\033[1;34m %s\033[0m\n" %
+            (" " * indentation, request.path_info))
         width = terminal_width()
         total_time = 0.0
         for query in connection.queries:
@@ -52,6 +56,7 @@ def SqlPrintingMiddleware(get_response):
             print("%s%s\n" % (" " * indentation, sql))
         replace_tuple = (" " * indentation, str(total_time))
         print("%s\033[1;32m[TOTAL TIME: %s seconds]\033[0m" % replace_tuple)
-        print("%s\033[1;32m[TOTAL QUERIES: %s]\033[0m" % (" " * indentation, len(connection.queries)))
+        print("%s\033[1;32m[TOTAL QUERIES: %s]\033[0m" %
+              (" " * indentation, len(connection.queries)))
         return response
     return middleware

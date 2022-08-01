@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
         print(kwargs)
 
         user.set_password(password)
-        
+
         user.save(using=self._db)
         return user
 
@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
         """
         user = self.create_user(
             email,
-            password=password,**kwargs
+            password=password, **kwargs
         )
         user.staff = True
         user.is_superuser = True
@@ -39,17 +39,16 @@ class UserManager(BaseUserManager):
         return user
 
     def create_staffuser(self, email, password):
-            """
-            Creates and saves a staff user with the given email and password.
-            """
-            user = self.create_user(
-                email,
-                password=password,
-            )
-            user.staff = True
-            user.save(using=self._db)
-            return user
-
+        """
+        Creates and saves a staff user with the given email and password.
+        """
+        user = self.create_user(
+            email,
+            password=password,
+        )
+        user.staff = True
+        user.save(using=self._db)
+        return user
 
     def create_testuser(self, email, password, **kwargs):
         """
@@ -57,7 +56,7 @@ class UserManager(BaseUserManager):
         """
         user = self.create_user(
             email,
-            password=password,**kwargs
+            password=password, **kwargs
         )
         user.staff = True
         user.admin = True
@@ -71,7 +70,6 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
-
         user = self.model(
             email=self.normalize_email(email),
             **kwargs
@@ -79,11 +77,9 @@ class UserManager(BaseUserManager):
         print(kwargs)
 
         user.set_password(password)
-        
+
         user.save(using=self._db)
         return user
-
-
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
@@ -99,8 +95,8 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     lastname = models.CharField(max_length=100)
     timezone = models.CharField(max_length=50, default="UTC", choices=TIMEZONE)
     is_active = models.BooleanField(default=True)
-    staff = models.BooleanField(default=False) # a admin user; non super-user
-    admin = models.BooleanField(default=False) # a superuser
+    staff = models.BooleanField(default=False)  # a admin user; non super-user
+    admin = models.BooleanField(default=False)  # a superuser
     objects = UserManager()
 
     REQUIRED_FIELDS = ["timezone"]
@@ -108,7 +104,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     def _get_full_name(self):
         return f"{self.firstname} {self.lastname}"
-
 
     def __str__(self):
         return self.email
@@ -122,10 +117,11 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
     @property
     def full_name(self):
         return self._get_full_name
-    
+
     @property
     def is_staff(self):
         "Is the user a member of staff?"
