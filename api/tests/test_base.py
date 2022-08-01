@@ -1,10 +1,5 @@
-import email
-from os import access
 from django.urls import include, path
-from requests import request
-from django.urls import reverse_lazy
-from rest_framework.routers import reverse
-from rest_framework.test import APIRequestFactory, APISimpleTestCase, APITestCase, URLPatternsTestCase, APIClient
+from rest_framework.test import APIRequestFactory, APITestCase, APIClient
 from django.contrib.auth import get_user_model
 from api.models import Link
 from api.views import LinkViewSet
